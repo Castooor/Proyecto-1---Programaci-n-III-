@@ -1,0 +1,8 @@
+cr/ac/una/est/pos/model/Cliente.class
+cr/ac/una/est/pos/model/OrdenLocal.class
+cr/ac/una/est/pos/Launcher.class
+cr/ac/una/est/pos/model/Orden.class
+cr/ac/una/est/pos/Main.class
+cr/ac/una/est/pos/model/Producto.class
+cr/ac/una/est/pos/model/OrdenExpress.class
+cr/ac/una/est/pos/model/ItemOrden.class
