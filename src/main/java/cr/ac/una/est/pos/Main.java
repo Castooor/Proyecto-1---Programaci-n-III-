@@ -1,32 +1,30 @@
 package cr.ac.una.est.pos;
 
 import javafx.application.Application;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.scene.control.Label;
-import javafx.scene.layout.StackPane;
 import javafx.stage.Stage;
 
 /**
- * Clase principal que arranca la aplicación JavaFX.
- * Por ahora solo muestra una ventana de prueba para confirmar
- * que la configuración de Maven y JavaFX está correcta.
+ * Clase principal que arranca la aplicación JavaFX y carga la
+ * pantalla inicial del sistema (el catálogo de productos).
  */
 public class Main extends Application {
 
     /**
-     * Punto de entrada de JavaFX. Se ejecuta automáticamente después
-     * de llamar a launch() y aquí se arma la ventana principal.
+     * Punto de entrada de JavaFX. Carga el FXML del catálogo y
+     * lo muestra en la ventana principal.
      *
      * @param stage la ventana principal que provee JavaFX
      * @return no retorna nada, solo configura y muestra la ventana
      */
     @Override
-    public void start(Stage stage) {
-        Label label = new Label("¡JavaFX está funcionando!");
-        StackPane root = new StackPane(label);
-        Scene scene = new Scene(root, 400, 300);
+    public void start(Stage stage) throws Exception {
+        Parent root = FXMLLoader.load(getClass().getResource("/cr/ac/una/est/pos/view/CatalogoView.fxml"));
+        Scene scene = new Scene(root);
 
-        stage.setTitle("Sistema POS - Prueba inicial");
+        stage.setTitle("Sistema POS - Catálogo de Productos");
         stage.setScene(scene);
         stage.show();
     }
