@@ -33,15 +33,15 @@ public class CatalogoController {
 
     /**
      * Se ejecuta automáticamente apenas JavaFX carga el FXML.
-     * Aquí preparamos el servicio, conectamos las columnas de la
-     * tabla con los atributos de Producto, y agregamos el listener
-     * que llena el formulario al seleccionar una fila.
+     * Aquí conectamos las columnas de la tabla con los atributos
+     * de Producto y agregamos el listener que llena el formulario
+     * al seleccionar una fila. El servicio se recibe después,
+     * mediante setProductoService().
      *
      * @return no retorna nada
      */
     @FXML
     public void initialize() {
-        productoService = new ProductoService();
         listaObservable = FXCollections.observableArrayList();
         tablaProductos.setItems(listaObservable);
 
@@ -56,6 +56,18 @@ public class CatalogoController {
                 cargarFormulario(seleccionado);
             }
         });
+    }
+
+    /**
+     * Recibe el servicio de productos compartido (creado una sola
+     * vez en MainController) y refresca la tabla con sus datos.
+     *
+     * @param productoService el servicio de productos a usar
+     * @return no retorna nada
+     */
+    public void setProductoService(ProductoService productoService) {
+        this.productoService = productoService;
+        refrescarTabla();
     }
 
     /**
