@@ -73,6 +73,7 @@
                 </TableView>
                 <HBox spacing="10" alignment="CENTER_LEFT">
                     <Button text="Quitar del carrito" onAction="#onQuitarDelCarrito"/>
+                    <Button text="Facturar" onAction="#onFacturar"/>
                     <Label fx:id="lblSubtotal" text="Subtotal: ₡0" style="-fx-font-weight: bold;"/>
                 </HBox>
             </VBox>
