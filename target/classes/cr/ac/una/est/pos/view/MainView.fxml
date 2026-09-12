@@ -15,6 +15,7 @@
             <Button text="Clientes" onAction="#onMostrarClientes"/>
             <Button text="Nueva Orden" onAction="#onMostrarOrdenes"/>
             <Button text="Modo Oscuro/Claro" onAction="#onCambiarModo"/>
+            <Button text="Cerrar Sesión" onAction="#onCerrarSesion"/>
         </HBox>
     </top>
 
