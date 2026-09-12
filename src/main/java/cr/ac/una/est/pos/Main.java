@@ -13,14 +13,20 @@ import javafx.stage.Stage;
 public class Main extends Application {
 
     /**
-     * Punto de entrada de JavaFX. Carga el FXML principal y lo
-     * muestra en la ventana.
+     * Punto de entrada de JavaFX. Configura un manejador de errores
+     * no previstos, carga el FXML principal y lo muestra en la
+     * ventana.
      *
      * @param stage la ventana principal que provee JavaFX
      * @return no retorna nada, solo configura y muestra la ventana
      */
     @Override
     public void start(Stage stage) throws Exception {
+        Thread.setDefaultUncaughtExceptionHandler((thread, excepcion) -> {
+            System.err.println("Error inesperado: " + excepcion.getMessage());
+            excepcion.printStackTrace();
+        });
+
         Parent root = FXMLLoader.load(getClass().getResource("/cr/ac/una/est/pos/view/MainView.fxml"));
         Scene scene = new Scene(root);
 

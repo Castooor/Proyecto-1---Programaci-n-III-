@@ -141,6 +141,9 @@ public class OrdenController {
 
             if (rbLocal.isSelected()) {
                 int mesa = Integer.parseInt(txtMesa.getText());
+                if (mesa <= 0) {
+                    throw new IllegalArgumentException("El número de mesa debe ser mayor a cero.");
+                }
                 ordenActual = ordenService.crearOrdenLocal(cliente, mesa);
             } else {
                 if (txtDireccion.getText().isBlank()) {
