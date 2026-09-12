@@ -9,6 +9,7 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.layout.StackPane;
+import javafx.stage.Stage;
 
 import java.io.IOException;
 
@@ -112,6 +113,30 @@ public class MainController {
      *
      * @param rutaFxml ruta del archivo FXML
      */
+
+    /**
+     * Cierra la sesión actual y regresa a la pantalla de login,
+     * reemplazando la escena de la ventana.
+     *
+     * @return no retorna nada
+     */
+    @FXML
+    private void onCerrarSesion() {
+        try {
+            Parent login = FXMLLoader.load(
+                    getClass().getResource("/cr/ac/una/est/pos/view/LoginView.fxml")
+            );
+
+            Stage stage = (Stage) panelCentral.getScene().getWindow();
+
+            stage.setScene(new Scene(login, 750, 500));
+
+        } catch (IOException e) {
+            System.err.println("No se pudo volver a la pantalla de login.");
+            e.printStackTrace();
+        }
+    }
+
     private void cargarVista(String rutaFxml) {
 
         try {
