@@ -1,5 +1,6 @@
 package cr.ac.una.est.pos.controller;
 
+import cr.ac.una.est.pos.model.Orden;
 import cr.ac.una.est.pos.service.ClienteService;
 import cr.ac.una.est.pos.service.OrdenService;
 import cr.ac.una.est.pos.service.ProductoService;
@@ -23,6 +24,8 @@ public class MainController {
     private final ProductoService productoService = new ProductoService();
     private final ClienteService clienteService = new ClienteService();
     private final OrdenService ordenService = new OrdenService(productoService);
+
+    private Orden ordenEnFacturacion;
 
     /**
      * Se ejecuta automáticamente al cargar el FXML. Muestra el
@@ -66,6 +69,18 @@ public class MainController {
     }
 
     /**
+     * Recibe la orden que se va a facturar (enviada desde
+     * OrdenController) y navega a la pantalla de Facturación.
+     *
+     * @param orden la orden a facturar
+     * @return no retorna nada
+     */
+    public void mostrarFacturacion(Orden orden) {
+        this.ordenEnFacturacion = orden;
+        cargarVista("/cr/ac/una/est/pos/view/FacturaView.fxml");
+    }
+
+    /**
      * Carga un archivo FXML, le inyecta al controlador resultante el
      * servicio compartido que corresponda según su tipo, y reemplaza
      * el contenido del panel central con la vista cargada.
@@ -79,12 +94,18 @@ public class MainController {
             Parent vista = loader.load();
             Object controlador = loader.getController();
 
-            if (controlador instanceof CatalogoController catalogoController) {
+            if (controlador instanceof CatalogoController) {
+                CatalogoController catalogoController = (CatalogoController) controlador;
                 catalogoController.setProductoService(productoService);
-            } else if (controlador instanceof ClienteController clienteController) {
+            } else if (controlador instanceof ClienteController) {
+                ClienteController clienteController = (ClienteController) controlador;
                 clienteController.setClienteService(clienteService);
-            } else if (controlador instanceof OrdenController ordenController) {
-                ordenController.setServicios(productoService, clienteService, ordenService);
+            } else if (controlador instanceof OrdenController) {
+                OrdenController ordenController = (OrdenController) controlador;
+                ordenController.setServicios(productoService, clienteService, ordenService, this);
+            } else if (controlador instanceof FacturaController) {
+                FacturaController facturaController = (FacturaController) controlador;
+                facturaController.setOrden(ordenEnFacturacion);
             }
 
             panelCentral.getChildren().setAll(vista);

@@ -49,6 +49,8 @@ public class OrdenController {
     private ObservableList<ItemOrden> listaCarrito;
     private Orden ordenActual;
 
+    private MainController mainController;
+
     /**
      * Se ejecuta automáticamente apenas JavaFX carga el FXML.
      * Prepara las tablas y el listener que muestra/oculta los
@@ -82,15 +84,17 @@ public class OrdenController {
      * Recibe los tres servicios compartidos (creados en MainController)
      * y llena el ComboBox de clientes y la tabla del catálogo.
      *
-     * @param productoService el servicio de productos a usar
-     * @param clienteService el servicio de clientes a usar
-     * @param ordenService el servicio de órdenes a usar
-     * @return no retorna nada
-     */
-    public void setServicios(ProductoService productoService, ClienteService clienteService, OrdenService ordenService) {
+     @param productoService el servicio de productos a usar
+     @param clienteService el servicio de clientes a usar
+     @param ordenService el servicio de órdenes a usar
+     @param mainController el controlador principal, para navegación
+     @return no retorna nada*/
+    public void setServicios(ProductoService productoService, ClienteService clienteService,
+                             OrdenService ordenService, MainController mainController) {
         this.productoService = productoService;
         this.clienteService = clienteService;
         this.ordenService = ordenService;
+        this.mainController = mainController;
 
         listaCatalogo.setAll(productoService.listarTodos());
 
@@ -183,12 +187,6 @@ public class OrdenController {
             mostrarError(e.getMessage());
         }
     }
-
-    /**
-     * Quita del carrito el ítem seleccionado en la tabla del carrito.
-     *
-     * @return no retorna nada
-     */
     @FXML
     public void onQuitarDelCarrito() {
         ItemOrden seleccionado = tablaCarrito.getSelectionModel().getSelectedItem();
@@ -197,6 +195,23 @@ public class OrdenController {
             listaCarrito.setAll(ordenActual.getItems());
             actualizarSubtotal();
         }
+    }
+    /**
+     * Envía la orden actual a la pantalla de Facturación.
+     *
+     * @return no retorna nada
+     */
+    @FXML
+    public void onFacturar() {
+        if (ordenActual == null) {
+            mostrarError("Primero debe iniciar una orden.");
+            return;
+        }
+        if (ordenActual.getItems().isEmpty()) {
+            mostrarError("El carrito está vacío. Agregue al menos un producto antes de facturar.");
+            return;
+        }
+        mainController.mostrarFacturacion(ordenActual);
     }
 
     /**
