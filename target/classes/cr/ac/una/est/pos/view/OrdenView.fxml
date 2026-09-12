@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<BorderPane xmlns="http://javafx.com/javafx"
+            xmlns:fx="http://javafx.com/fxml"
+            fx:controller="cr.ac.una.est.pos.controller.OrdenController"
+            prefWidth="800" prefHeight="550">
+
+    <top>
+        <VBox spacing="8">
+            <padding>
+                <Insets top="15" right="15" bottom="10" left="15"/>
+            </padding>
+
+            <HBox spacing="10" alignment="CENTER_LEFT">
+                <Label text="Cliente:"/>
+                <ComboBox fx:id="cbCliente" prefWidth="220"/>
+
+                <RadioButton fx:id="rbLocal" text="Comer en el local" selected="true">
+                    <toggleGroup>
+                        <ToggleGroup fx:id="tgTipoOrden"/>
+                    </toggleGroup>
+                </RadioButton>
+                <RadioButton fx:id="rbExpress" text="Express" toggleGroup="$tgTipoOrden"/>
+            </HBox>
+
+            <HBox spacing="10" alignment="CENTER_LEFT">
+                <Label fx:id="lblMesa" text="Número de mesa:"/>
+                <TextField fx:id="txtMesa" prefWidth="80"/>
+
+                <Label fx:id="lblDireccion" text="Dirección:" visible="false" managed="false"/>
+                <TextField fx:id="txtDireccion" prefWidth="250" visible="false" managed="false"/>
+
+                <Button text="Iniciar Orden" onAction="#onIniciarOrden"/>
+            </HBox>
+        </VBox>
+    </top>
+
+    <center>
+        <HBox spacing="10">
+            <padding>
+                <Insets left="15" right="15" bottom="15"/>
+            </padding>
+
+            <VBox spacing="8" prefWidth="380">
+                <Label text="Catálogo de Productos" style="-fx-font-weight: bold;"/>
+                <TableView fx:id="tablaCatalogo" prefHeight="300">
+                    <columns>
+                        <TableColumn fx:id="colCatCodigo" text="Código" prefWidth="70"/>
+                        <TableColumn fx:id="colCatNombre" text="Nombre" prefWidth="140"/>
+                        <TableColumn fx:id="colCatPrecio" text="Precio" prefWidth="80"/>
+                        <TableColumn fx:id="colCatInventario" text="Stock" prefWidth="70"/>
+                    </columns>
+                </TableView>
+                <HBox spacing="10" alignment="CENTER_LEFT">
+                    <Label text="Cantidad:"/>
+                    <TextField fx:id="txtCantidad" prefWidth="60"/>
+                    <Button text="Agregar al carrito" onAction="#onAgregarAlCarrito"/>
+                </HBox>
+            </VBox>
+
+            <VBox spacing="8">
+                <Label text="Carrito" style="-fx-font-weight: bold;"/>
+                <TableView fx:id="tablaCarrito" prefHeight="300">
+                    <columns>
+                        <TableColumn fx:id="colCarProducto" text="Producto" prefWidth="150"/>
+                        <TableColumn fx:id="colCarCantidad" text="Cantidad" prefWidth="80"/>
+                        <TableColumn fx:id="colCarSubtotal" text="Subtotal" prefWidth="90"/>
+                    </columns>
+                </TableView>
+                <HBox spacing="10" alignment="CENTER_LEFT">
+                    <Button text="Quitar del carrito" onAction="#onQuitarDelCarrito"/>
+                    <Label fx:id="lblSubtotal" text="Subtotal: ₡0" style="-fx-font-weight: bold;"/>
+                </HBox>
+            </VBox>
+        </HBox>
+    </center>
+
+</BorderPane>

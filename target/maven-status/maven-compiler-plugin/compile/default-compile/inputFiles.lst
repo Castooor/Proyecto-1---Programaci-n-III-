@@ -1,5 +1,7 @@
 C:\Users\carlo\OneDrive\Desktop\ProyectoPrograIII\src\main\java\cr\ac\una\est\pos\controller\CatalogoController.java
 C:\Users\carlo\OneDrive\Desktop\ProyectoPrograIII\src\main\java\cr\ac\una\est\pos\controller\ClienteController.java
+C:\Users\carlo\OneDrive\Desktop\ProyectoPrograIII\src\main\java\cr\ac\una\est\pos\controller\MainController.java
+C:\Users\carlo\OneDrive\Desktop\ProyectoPrograIII\src\main\java\cr\ac\una\est\pos\controller\OrdenController.java
 C:\Users\carlo\OneDrive\Desktop\ProyectoPrograIII\src\main\java\cr\ac\una\est\pos\Launcher.java
 C:\Users\carlo\OneDrive\Desktop\ProyectoPrograIII\src\main\java\cr\ac\una\est\pos\Main.java
 C:\Users\carlo\OneDrive\Desktop\ProyectoPrograIII\src\main\java\cr\ac\una\est\pos\model\Cliente.java
@@ -9,4 +11,5 @@ C:\Users\carlo\OneDrive\Desktop\ProyectoPrograIII\src\main\java\cr\ac\una\est\po
 C:\Users\carlo\OneDrive\Desktop\ProyectoPrograIII\src\main\java\cr\ac\una\est\pos\model\OrdenLocal.java
 C:\Users\carlo\OneDrive\Desktop\ProyectoPrograIII\src\main\java\cr\ac\una\est\pos\model\Producto.java
 C:\Users\carlo\OneDrive\Desktop\ProyectoPrograIII\src\main\java\cr\ac\una\est\pos\service\ClienteService.java
+C:\Users\carlo\OneDrive\Desktop\ProyectoPrograIII\src\main\java\cr\ac\una\est\pos\service\OrdenService.java
 C:\Users\carlo\OneDrive\Desktop\ProyectoPrograIII\src\main\java\cr\ac\una\est\pos\service\ProductoService.java
