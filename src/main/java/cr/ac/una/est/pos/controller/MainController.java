@@ -7,6 +7,7 @@ import cr.ac.una.est.pos.service.ProductoService;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
+import javafx.scene.Scene;
 import javafx.scene.layout.StackPane;
 import java.io.IOException;
 
@@ -14,9 +15,14 @@ import java.io.IOException;
  * Controlador de la pantalla principal (contenedora). Es dueño único
  * de los servicios compartidos (Producto, Cliente, Orden) y se
  * encarga de la navegación: al cargar cada vista, le inyecta el
- * servicio que necesite mediante su setter correspondiente.
+ * servicio que necesite mediante su setter correspondiente. También
+ * controla el cambio entre modo oscuro y modo claro de toda la
+ * interfaz.
  */
 public class MainController {
+
+    private static final String CSS_OSCURO = "/cr/ac/una/est/pos/css/dark.css";
+    private static final String CSS_CLARO = "/cr/ac/una/est/pos/css/light.css";
 
     @FXML
     private StackPane panelCentral;
@@ -26,6 +32,7 @@ public class MainController {
     private final OrdenService ordenService = new OrdenService(productoService);
 
     private Orden ordenEnFacturacion;
+    private boolean modoOscuroActivo = false;
 
     /**
      * Se ejecuta automáticamente al cargar el FXML. Muestra el
@@ -81,6 +88,26 @@ public class MainController {
     }
 
     /**
+     * Alterna toda la interfaz entre modo oscuro y modo claro,
+     * cambiando la hoja de estilos CSS aplicada a la ventana completa.
+     * Como el CSS se aplica a nivel de Scene (no de cada vista por
+     * separado), el cambio afecta cualquier pantalla que se esté
+     * mostrando en ese momento.
+     *
+     * @return no retorna nada
+     */
+    @FXML
+    public void onCambiarModo() {
+        Scene escena = panelCentral.getScene();
+        escena.getStylesheets().clear();
+
+        String hojaEstilos = modoOscuroActivo ? CSS_CLARO : CSS_OSCURO;
+        escena.getStylesheets().add(getClass().getResource(hojaEstilos).toExternalForm());
+
+        modoOscuroActivo = !modoOscuroActivo;
+    }
+
+    /**
      * Carga un archivo FXML, le inyecta al controlador resultante el
      * servicio compartido que corresponda según su tipo, y reemplaza
      * el contenido del panel central con la vista cargada.
@@ -104,9 +131,9 @@ public class MainController {
                 OrdenController ordenController = (OrdenController) controlador;
                 ordenController.setServicios(productoService, clienteService, ordenService, this);
             } else if (controlador instanceof FacturaController) {
-            FacturaController facturaController = (FacturaController) controlador;
-            facturaController.setOrden(ordenEnFacturacion, productoService);
-        }
+                FacturaController facturaController = (FacturaController) controlador;
+                facturaController.setOrden(ordenEnFacturacion, productoService);
+            }
 
             panelCentral.getChildren().setAll(vista);
         } catch (IOException e) {

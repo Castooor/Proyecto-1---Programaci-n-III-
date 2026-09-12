@@ -14,6 +14,7 @@
             <Button text="Catálogo" onAction="#onMostrarCatalogo"/>
             <Button text="Clientes" onAction="#onMostrarClientes"/>
             <Button text="Nueva Orden" onAction="#onMostrarOrdenes"/>
+            <Button text="Modo Oscuro/Claro" onAction="#onCambiarModo"/>
         </HBox>
     </top>
 
