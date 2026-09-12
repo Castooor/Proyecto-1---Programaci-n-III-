@@ -1,5 +1,4 @@
 package cr.ac.una.est.pos.service;
-
 import cr.ac.una.est.pos.model.Producto;
 import java.util.ArrayList;
 
@@ -32,6 +31,20 @@ public class ProductoService {
         }
         productos.add(producto);
     }
+
+    /**
+
+     Descuenta del inventario la cantidad vendida de un producto,
+     usado al confirmar una factura. Valida que no se descuente
+     más de lo que hay disponible (por seguridad, aunque ya se
+     validó antes al armar el carrito).*
+     @param producto el producto cuyo inventario se va a descontar
+     @param cantidad la cantidad vendida
+     @return no retorna nada*/
+    public void descontarInventario(Producto producto, int cantidad) {
+        if (cantidad > producto.getCantidadInventario()) {
+            throw new IllegalArgumentException("No hay suficiente inventario de " + producto.getNombre() + " para completar la venta.");}
+        producto.setCantidadInventario(producto.getCantidadInventario() - cantidad);}
 
     /**
      * Obtiene la lista completa de productos del catálogo.

@@ -2,6 +2,8 @@ package cr.ac.una.est.pos.controller;
 
 import cr.ac.una.est.pos.model.Orden;
 import cr.ac.una.est.pos.model.Pago;
+import cr.ac.una.est.pos.service.ProductoService;
+import cr.ac.una.est.pos.model.ItemOrden;
 import cr.ac.una.est.pos.model.PagoEfectivo;
 import cr.ac.una.est.pos.service.FacturaService;
 import javafx.fxml.FXML;
@@ -31,7 +33,8 @@ public class FacturaController {
     @FXML private TextField txtMontoRecibido;
 
     @FXML private Label lblResultado;
-
+    private ProductoService productoService;
+    private boolean yaFacturado = false;
     private FacturaService facturaService;
     private Orden orden;
 
@@ -59,8 +62,9 @@ public class FacturaController {
      * @param orden la orden a facturar
      * @return no retorna nada
      */
-    public void setOrden(Orden orden) {
+    public void setOrden(Orden orden, ProductoService productoService) {
         this.orden = orden;
+        this.productoService = productoService;
         lblResumenOrden.setText(orden.generarResumen());
         lblSubtotal.setText(String.format("₡%.2f", orden.calcularSubtotal()));
         lblEnvio.setText(String.format("₡%.2f", orden.calcularCostoAdicional()));
@@ -78,6 +82,9 @@ public class FacturaController {
     @FXML
     public void onConfirmarPago() {
         try {
+            if (yaFacturado) {
+                throw new IllegalArgumentException("Esta orden ya fue facturada.");
+            }
             if (orden.getItems().isEmpty()) {
                 throw new IllegalArgumentException("No se puede facturar una orden sin productos.");
             }
@@ -92,7 +99,12 @@ public class FacturaController {
                 pago = facturaService.crearPagoSinpe(orden);
             }
 
-            lblResultado.setText("¡Factura completada!\n" + pago.generarResumen());
+            for (ItemOrden item : orden.getItems()) {
+                productoService.descontarInventario(item.getProducto(), item.getCantidad());
+            }
+            yaFacturado = true;
+
+            lblResultado.setText("¡Factura completada! Inventario actualizado.\n" + pago.generarResumen());
         } catch (NumberFormatException e) {
             mostrarError("El monto recibido debe ser un número válido.");
         } catch (IllegalArgumentException e) {

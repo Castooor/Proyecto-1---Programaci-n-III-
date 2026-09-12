@@ -104,9 +104,9 @@ public class MainController {
                 OrdenController ordenController = (OrdenController) controlador;
                 ordenController.setServicios(productoService, clienteService, ordenService, this);
             } else if (controlador instanceof FacturaController) {
-                FacturaController facturaController = (FacturaController) controlador;
-                facturaController.setOrden(ordenEnFacturacion);
-            }
+            FacturaController facturaController = (FacturaController) controlador;
+            facturaController.setOrden(ordenEnFacturacion, productoService);
+        }
 
             panelCentral.getChildren().setAll(vista);
         } catch (IOException e) {
