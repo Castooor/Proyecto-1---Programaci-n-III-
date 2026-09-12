@@ -12,7 +12,7 @@
 
 ---
 
-## 📋 Bitácora de Contribuciones
+## Bitácora de Contribuciones
 
 ### Contribuyentes y sus Aportes
 
@@ -25,7 +25,7 @@
 
 ---
 
-## 🚀 Funcionalidades Implementadas
+## Funcionalidades Implementadas
 
 - [x] Gestión de productos y catálogo
 - [x] Gestión de clientes
@@ -39,7 +39,7 @@
 
 ---
 
-## 📝 Estructura del Proyecto
+## Estructura del Proyecto
 
 El proyecto utiliza una arquitectura MVC con servicios compartidos:
 - **Services:** ProductoService, ClienteService, OrdenService, RepositorioGenerico
@@ -48,7 +48,7 @@ El proyecto utiliza una arquitectura MVC con servicios compartidos:
 
 ---
 
-## 🔧 Tecnologías Utilizadas
+## Tecnologías Utilizadas
 
 - **Java:** Lenguaje principal de desarrollo
 - **JavaFX:** Framework para interfaz gráfica
