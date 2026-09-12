@@ -29,15 +29,15 @@ public class ClienteController {
 
     /**
      * Se ejecuta automáticamente apenas JavaFX carga el FXML.
-     * Prepara el servicio, conecta las columnas de la tabla, y
-     * agrega el listener que llena el formulario al seleccionar
-     * una fila.
+     * Aquí conectamos las columnas de la tabla con los atributos
+     * de Cliente y agregamos el listener que llena el formulario
+     * al seleccionar una fila. El servicio se recibe después,
+     * mediante setClienteService().
      *
      * @return no retorna nada
      */
     @FXML
     public void initialize() {
-        clienteService = new ClienteService();
         listaObservable = FXCollections.observableArrayList();
         tablaClientes.setItems(listaObservable);
 
@@ -50,6 +50,18 @@ public class ClienteController {
                 cargarFormulario(seleccionado);
             }
         });
+    }
+
+    /**
+     * Recibe el servicio de clientes compartido (creado una sola
+     * vez en MainController) y refresca la tabla con sus datos.
+     *
+     * @param clienteService el servicio de clientes a usar
+     * @return no retorna nada
+     */
+    public void setClienteService(ClienteService clienteService) {
+        this.clienteService = clienteService;
+        refrescarTabla();
     }
 
     /**
