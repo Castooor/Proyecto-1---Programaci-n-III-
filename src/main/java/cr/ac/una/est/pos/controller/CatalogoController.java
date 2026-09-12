@@ -99,6 +99,9 @@ public class CatalogoController {
     @FXML
     public void onActualizar() {
         try {
+            if (txtCodigo.getText().isBlank() || txtNombre.getText().isBlank()) {
+                throw new IllegalArgumentException("Código y nombre son obligatorios.");
+            }
             String codigo = txtCodigo.getText();
             double precio = Double.parseDouble(txtPrecio.getText());
             int inventario = Integer.parseInt(txtInventario.getText());

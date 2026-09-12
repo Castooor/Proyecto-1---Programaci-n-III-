@@ -26,8 +26,8 @@ public class Producto {
         this.codigo = codigo;
         this.nombre = nombre;
         this.categoria = categoria;
-        this.precio = precio;
-        this.cantidadInventario = cantidadInventario;
+        setPrecio(precio);
+        setCantidadInventario(cantidadInventario);
     }
 
     /**
