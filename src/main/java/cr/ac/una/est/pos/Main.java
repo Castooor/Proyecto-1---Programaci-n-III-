@@ -1,5 +1,6 @@
 package cr.ac.una.est.pos;
 
+import javafx.scene.image.Image;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
@@ -27,20 +28,27 @@ public class Main extends Application {
             excepcion.printStackTrace();
         });
 
-        Parent root = FXMLLoader.load(getClass().getResource("/cr/ac/una/est/pos/view/MainView.fxml"));
+        Parent root = FXMLLoader.load(
+                getClass().getResource("/cr/ac/una/est/pos/view/MainView.fxml")
+        );
+
         Scene scene = new Scene(root);
 
         stage.setTitle("Sistema POS - Soda o Pulpería");
+
+        Image icono = new Image(
+                getClass().getResourceAsStream("/images/icono.png")
+        );
+
+        stage.getIcons().add(icono);
         stage.setScene(scene);
         stage.show();
     }
 
     /**
-     * Punto de entrada del programa (el que ejecuta la JVM al inicio).
-     * Delega el arranque a JavaFX mediante launch().
+     * Punto de entrada del programa.
      *
-     * @param args argumentos de línea de comandos (no se usan)
-     * @return no retorna nada
+     * @param args argumentos de línea de comandos
      */
     public static void main(String[] args) {
         launch(args);
