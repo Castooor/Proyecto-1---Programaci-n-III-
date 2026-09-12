@@ -10,7 +10,7 @@
             prefWidth="750" prefHeight="500">
 
     <top>
-        <HBox spacing="10" alignment="CENTER_LEFT" style="-fx-background-color: #2c3e50; -fx-padding: 10;">
+        <HBox spacing="10" alignment="CENTER_LEFT" style="-fx-padding: 10;" styleClass="menu-bar">
             <Button text="Catálogo" onAction="#onMostrarCatalogo"/>
             <Button text="Clientes" onAction="#onMostrarClientes"/>
             <Button text="Nueva Orden" onAction="#onMostrarOrdenes"/>

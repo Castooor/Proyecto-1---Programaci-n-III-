@@ -9,36 +9,34 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.layout.StackPane;
+
 import java.io.IOException;
 
 /**
  * Controlador de la pantalla principal (contenedora). Es dueño único
  * de los servicios compartidos (Producto, Cliente, Orden) y se
  * encarga de la navegación: al cargar cada vista, le inyecta el
- * servicio que necesite mediante su setter correspondiente. También
- * controla el cambio entre modo oscuro y modo claro de toda la
- * interfaz.
+ * servicio que necesite mediante su setter correspondiente.
+ * También controla el cambio entre modo oscuro y modo claro.
  */
 public class MainController {
 
-    private static final String CSS_OSCURO = "/cr/ac/una/est/pos/css/dark.css";
-    private static final String CSS_CLARO = "/cr/ac/una/est/pos/css/light.css";
+    private static final String CSS_OSCURO =
+            "/css/dark.css";
 
     @FXML
     private StackPane panelCentral;
 
     private final ProductoService productoService = new ProductoService();
     private final ClienteService clienteService = new ClienteService();
-    private final OrdenService ordenService = new OrdenService(productoService);
+    private final OrdenService ordenService =
+            new OrdenService(productoService);
 
     private Orden ordenEnFacturacion;
-    private boolean modoOscuroActivo = false;
 
     /**
-     * Se ejecuta automáticamente al cargar el FXML. Muestra el
-     * catálogo como pantalla inicial por defecto.
-     *
-     * @return no retorna nada
+     * Se ejecuta automáticamente al cargar el FXML.
+     * Muestra el catálogo como pantalla inicial.
      */
     @FXML
     public void initialize() {
@@ -46,9 +44,7 @@ public class MainController {
     }
 
     /**
-     * Muestra la pantalla del catálogo de productos en el panel central.
-     *
-     * @return no retorna nada
+     * Muestra la pantalla del catálogo de productos.
      */
     @FXML
     public void onMostrarCatalogo() {
@@ -56,9 +52,7 @@ public class MainController {
     }
 
     /**
-     * Muestra la pantalla de gestión de clientes en el panel central.
-     *
-     * @return no retorna nada
+     * Muestra la pantalla de gestión de clientes.
      */
     @FXML
     public void onMostrarClientes() {
@@ -66,9 +60,7 @@ public class MainController {
     }
 
     /**
-     * Muestra la pantalla de toma de pedidos (Órdenes) en el panel central.
-     *
-     * @return no retorna nada
+     * Muestra la pantalla de toma de pedidos.
      */
     @FXML
     public void onMostrarOrdenes() {
@@ -76,11 +68,10 @@ public class MainController {
     }
 
     /**
-     * Recibe la orden que se va a facturar (enviada desde
-     * OrdenController) y navega a la pantalla de Facturación.
+     * Recibe la orden que se va a facturar y muestra
+     * la pantalla de facturación.
      *
      * @param orden la orden a facturar
-     * @return no retorna nada
      */
     public void mostrarFacturacion(Orden orden) {
         this.ordenEnFacturacion = orden;
@@ -88,56 +79,96 @@ public class MainController {
     }
 
     /**
-     * Alterna toda la interfaz entre modo oscuro y modo claro,
-     * cambiando la hoja de estilos CSS aplicada a la ventana completa.
-     * Como el CSS se aplica a nivel de Scene (no de cada vista por
-     * separado), el cambio afecta cualquier pantalla que se esté
-     * mostrando en ese momento.
+     * Alterna entre el diseño claro original y el modo oscuro.
      *
-     * @return no retorna nada
+     * El modo claro no utiliza un CSS adicional. Al quitar
+     * dark.css, JavaFX vuelve a utilizar el diseño original
+     * definido por los controles y los FXML.
      */
     @FXML
-    public void onCambiarModo() {
+    private void onCambiarModo() {
+
         Scene escena = panelCentral.getScene();
-        escena.getStylesheets().clear();
 
-        String hojaEstilos = modoOscuroActivo ? CSS_CLARO : CSS_OSCURO;
-        escena.getStylesheets().add(getClass().getResource(hojaEstilos).toExternalForm());
+        String oscuro = getClass()
+                .getResource(CSS_OSCURO)
+                .toExternalForm();
 
-        modoOscuroActivo = !modoOscuroActivo;
+        if (escena.getStylesheets().contains(oscuro)) {
+
+            // Quitar modo oscuro
+            escena.getStylesheets().remove(oscuro);
+
+        } else {
+
+            // Activar modo oscuro
+            escena.getStylesheets().add(oscuro);
+        }
     }
 
     /**
-     * Carga un archivo FXML, le inyecta al controlador resultante el
-     * servicio compartido que corresponda según su tipo, y reemplaza
-     * el contenido del panel central con la vista cargada.
+     * Carga un archivo FXML, obtiene su controlador y le
+     * proporciona los servicios que necesita.
      *
-     * @param rutaFxml la ruta (dentro de resources) del FXML a cargar
-     * @return no retorna nada
+     * @param rutaFxml ruta del archivo FXML
      */
     private void cargarVista(String rutaFxml) {
+
         try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource(rutaFxml));
+
+            FXMLLoader loader = new FXMLLoader(
+                    getClass().getResource(rutaFxml)
+            );
+
             Parent vista = loader.load();
+
             Object controlador = loader.getController();
 
             if (controlador instanceof CatalogoController) {
-                CatalogoController catalogoController = (CatalogoController) controlador;
+
+                CatalogoController catalogoController =
+                        (CatalogoController) controlador;
+
                 catalogoController.setProductoService(productoService);
+
             } else if (controlador instanceof ClienteController) {
-                ClienteController clienteController = (ClienteController) controlador;
+
+                ClienteController clienteController =
+                        (ClienteController) controlador;
+
                 clienteController.setClienteService(clienteService);
+
             } else if (controlador instanceof OrdenController) {
-                OrdenController ordenController = (OrdenController) controlador;
-                ordenController.setServicios(productoService, clienteService, ordenService, this);
+
+                OrdenController ordenController =
+                        (OrdenController) controlador;
+
+                ordenController.setServicios(
+                        productoService,
+                        clienteService,
+                        ordenService,
+                        this
+                );
+
             } else if (controlador instanceof FacturaController) {
-                FacturaController facturaController = (FacturaController) controlador;
-                facturaController.setOrden(ordenEnFacturacion, productoService);
+
+                FacturaController facturaController =
+                        (FacturaController) controlador;
+
+                facturaController.setOrden(
+                        ordenEnFacturacion,
+                        productoService
+                );
             }
 
             panelCentral.getChildren().setAll(vista);
+
         } catch (IOException e) {
-            System.err.println("No se pudo cargar la vista: " + rutaFxml);
+
+            System.err.println(
+                    "No se pudo cargar la vista: " + rutaFxml
+            );
+
             e.printStackTrace();
         }
     }
