@@ -21,8 +21,8 @@ import java.io.IOException;
  */
 public class MainController {
 
-    private static final String CSS_OSCURO = "/cr/ac/una/est/pos/css/dark.css";
-    private static final String CSS_CLARO = "/cr/ac/una/est/pos/css/light.css";
+    private static final String CSS_OSCURO = "/css/dark.css";
+    private static final String CSS_CLARO = "/css/light.css";
 
     @FXML
     private StackPane panelCentral;
