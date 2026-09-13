@@ -31,7 +31,7 @@ public class MainController {
     private final ProductoService productoService = new ProductoService();
     private final ClienteService clienteService = new ClienteService();
     private final OrdenService ordenService =
-            new OrdenService(productoService);
+            new OrdenService(productoService, clienteService);
 
     private Orden ordenEnFacturacion;
 
@@ -108,13 +108,6 @@ public class MainController {
     }
 
     /**
-     * Carga un archivo FXML, obtiene su controlador y le
-     * proporciona los servicios que necesita.
-     *
-     * @param rutaFxml ruta del archivo FXML
-     */
-
-    /**
      * Cierra la sesión actual y regresa a la pantalla de login,
      * reemplazando la escena de la ventana.
      *
@@ -182,7 +175,8 @@ public class MainController {
 
                 facturaController.setOrden(
                         ordenEnFacturacion,
-                        productoService
+                        productoService,
+                        ordenService
                 );
             }
 
