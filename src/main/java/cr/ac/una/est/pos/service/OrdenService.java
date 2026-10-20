@@ -5,6 +5,7 @@ import cr.ac.una.est.pos.model.ItemOrden;
 import cr.ac.una.est.pos.model.Orden;
 import cr.ac.una.est.pos.model.OrdenExpress;
 import cr.ac.una.est.pos.model.OrdenLocal;
+import cr.ac.una.est.pos.model.OrdenMostrador;
 import cr.ac.una.est.pos.model.Producto;
 
 import java.io.BufferedReader;
@@ -43,6 +44,10 @@ public class OrdenService {
 
     public Orden crearOrdenExpress(Cliente cliente, String direccion) {
         return new OrdenExpress(cliente, direccion);
+    }
+
+    public Orden crearOrdenMostrador(Cliente cliente) {
+        return new OrdenMostrador(cliente);
     }
 
     public void agregarProducto(Orden orden, Producto producto, int cantidad) {
@@ -122,10 +127,13 @@ public class OrdenService {
                     OrdenLocal local = (OrdenLocal) orden;
                     tipo = "LOCAL";
                     mesaODireccion = String.valueOf(local.getNumeroMesa());
-                } else {
+                } else if (orden instanceof OrdenExpress) {
                     OrdenExpress express = (OrdenExpress) orden;
                     tipo = "EXPRESS";
                     mesaODireccion = express.getDireccion();
+                } else {
+                    tipo = "MOSTRADOR";
+                    mesaODireccion = "N/A";
                 }
 
                 String items = "";
@@ -199,8 +207,10 @@ public class OrdenService {
         if (tipo.equals("LOCAL")) {
             int mesa = Integer.parseInt(mesaODireccion);
             orden = new OrdenLocal(cliente, mesa);
-        } else {
+        } else if (tipo.equals("EXPRESS")) {
             orden = new OrdenExpress(cliente, mesaODireccion);
+        } else {
+            orden = new OrdenMostrador(cliente);
         }
         orden.setId(id);
 

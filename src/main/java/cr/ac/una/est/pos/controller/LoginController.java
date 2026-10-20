@@ -1,5 +1,7 @@
 package cr.ac.una.est.pos.controller;
 
+import cr.ac.una.est.pos.model.Usuario;
+import cr.ac.una.est.pos.service.UsuarioService;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
@@ -12,15 +14,11 @@ import javafx.stage.Stage;
 import java.io.IOException;
 
 /**
- * Controlador de la pantalla de inicio de sesión. Valida las credenciales del usuario y, si son correctas, reemplaza la escena
- actual de la ventana por la pantalla principal del sistema.
-
- Como el proyecto no maneja usuarios en base de datos, las
- credenciales válidas se dejan fijas en esta clase.**/
+ * Controlador de la pantalla de inicio de sesión. Valida las credenciales
+ * mediante UsuarioService y pasa el usuario autenticado (con su TipoNegocio)
+ * a MainController para que cargue la interfaz adecuada (Soda o Pulpería).
+ */
 public class LoginController {
-
-    private static final String USUARIO_VALIDO = "admin";
-    private static final String CONTRASENA_VALIDA = "admin123";
 
     @FXML
     private TextField txtUsuario;
@@ -29,8 +27,11 @@ public class LoginController {
     @FXML
     private Label lblMensaje;
 
+    private UsuarioService usuarioService;
+
     @FXML
     public void initialize() {
+        usuarioService = new UsuarioService();
         lblMensaje.setText("");
     }
 
@@ -44,23 +45,31 @@ public class LoginController {
             return;
         }
 
-        if (usuario.equals(USUARIO_VALIDO) && contrasena.equals(CONTRASENA_VALIDA)) {
-            irAPantallaPrincipal();
+        Usuario usuarioAutenticado = usuarioService.autenticar(usuario, contrasena);
+
+        if (usuarioAutenticado != null) {
+            irAPantallaPrincipal(usuarioAutenticado);
         } else {
             mostrarError("Usuario o contraseña incorrectos.");
             txtContrasena.clear();
         }
     }
 
-    private void irAPantallaPrincipal() {
+    private void irAPantallaPrincipal(Usuario usuario) {
         try {
             if (getClass().getResource("/cr/ac/una/est/pos/view/MainView.fxml") == null) {
                 mostrarError("No se encontró el archivo FXML en la ruta especificada.");
                 return;
             }
 
-            Parent root = FXMLLoader.load(getClass().getResource("/cr/ac/una/est/pos/view/MainView.fxml"));
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/cr/ac/una/est/pos/view/MainView.fxml"));
+            Parent root = loader.load();
+
+            MainController mainController = loader.getController();
+            mainController.setUsuarioActual(usuario);
+
             Stage stage = (Stage) txtUsuario.getScene().getWindow();
+            stage.setTitle("Sistema POS - Modo " + usuario.getTipoNegocio().getDescripcion());
             stage.setScene(new Scene(root, 750, 500));
 
         } catch (IOException e) {

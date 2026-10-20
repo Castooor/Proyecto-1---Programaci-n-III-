@@ -13,11 +13,11 @@
         <VBox alignment="CENTER" spacing="6" BorderPane.alignment="CENTER">
 
             <Label text="Sistema POS" style="-fx-font-size: 28; -fx-font-weight: bold; -fx-text-fill: #2c3e50;"/>
-            <Label text="Soda o Pulpería" style="-fx-font-size: 14; -fx-text-fill: #7f8c8d;"/>
+            <Label text="Gestión de Soda y Pulpería" style="-fx-font-size: 14; -fx-text-fill: #7f8c8d;"/>
 
-            <VBox spacing="10" maxWidth="280" alignment="CENTER">
+            <VBox spacing="10" maxWidth="300" alignment="CENTER">
                 <padding>
-                    <Insets top="30"/>
+                    <Insets top="25"/>
                 </padding>
 
                 <Label text="Usuario:"/>
@@ -34,6 +34,13 @@
                 </Button>
 
                 <Label fx:id="lblMensaje" wrapText="true" style="-fx-text-fill: #c0392b;"/>
+
+                <VBox spacing="4" style="-fx-background-color: #ffffff; -fx-padding: 10; -fx-background-radius: 6; -fx-border-color: #bdc3c7; -fx-border-radius: 6;">
+                    <Label text="Usuarios predeterminados:" style="-fx-font-weight: bold; -fx-font-size: 11; -fx-text-fill: #2c3e50;"/>
+                    <Label text="• admin (Modo Soda) | Clave: admin123" style="-fx-font-size: 11; -fx-text-fill: #555555;"/>
+                    <Label text="• pulperia (Modo Pulpería) | Clave: admin123" style="-fx-font-size: 11; -fx-text-fill: #27ae60; -fx-font-weight: bold;"/>
+                    <Label text="• soda (Modo Soda) | Clave: admin123" style="-fx-font-size: 11; -fx-text-fill: #555555;"/>
+                </VBox>
             </VBox>
         </VBox>
     </center>

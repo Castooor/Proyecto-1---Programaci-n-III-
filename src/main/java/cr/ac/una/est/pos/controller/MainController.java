@@ -1,6 +1,8 @@
 package cr.ac.una.est.pos.controller;
 
 import cr.ac.una.est.pos.model.Orden;
+import cr.ac.una.est.pos.model.TipoNegocio;
+import cr.ac.una.est.pos.model.Usuario;
 import cr.ac.una.est.pos.service.ClienteService;
 import cr.ac.una.est.pos.service.OrdenService;
 import cr.ac.una.est.pos.service.ProductoService;
@@ -8,6 +10,8 @@ import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.control.Button;
+import javafx.scene.control.Label;
 import javafx.scene.layout.StackPane;
 import javafx.stage.Stage;
 
@@ -18,22 +22,23 @@ import java.io.IOException;
  * de los servicios compartidos (Producto, Cliente, Orden) y se
  * encarga de la navegación: al cargar cada vista, le inyecta el
  * servicio que necesite mediante su setter correspondiente.
- * También controla el cambio entre modo oscuro y modo claro.
+ * Adapta la navegación según el tipo de negocio del usuario actual
+ * (Soda o Pulpería).
  */
 public class MainController {
 
-    private static final String CSS_OSCURO =
-            "/css/dark.css";
+    private static final String CSS_OSCURO = "/css/dark.css";
 
-    @FXML
-    private StackPane panelCentral;
+    @FXML private StackPane panelCentral;
+    @FXML private Label lblInfoUsuario;
+    @FXML private Button btnNuevaOrden;
 
     private final ProductoService productoService = new ProductoService();
     private final ClienteService clienteService = new ClienteService();
-    private final OrdenService ordenService =
-            new OrdenService(productoService, clienteService);
+    private final OrdenService ordenService = new OrdenService(productoService, clienteService);
 
     private Orden ordenEnFacturacion;
+    private Usuario usuarioActual;
 
     /**
      * Se ejecuta automáticamente al cargar el FXML.
@@ -42,6 +47,40 @@ public class MainController {
     @FXML
     public void initialize() {
         cargarVista("/cr/ac/una/est/pos/view/CatalogoView.fxml");
+    }
+
+    /**
+     * Establece el usuario autenticado y ajusta la interfaz (títulos y botones)
+     * al modo Soda o Pulpería correspondiente.
+     *
+     * @param usuario el usuario que inició sesión
+     */
+    public void setUsuarioActual(Usuario usuario) {
+        this.usuarioActual = usuario;
+        actualizarInterfazSegunUsuario();
+    }
+
+    public Usuario getUsuarioActual() {
+        return usuarioActual;
+    }
+
+    private void actualizarInterfazSegunUsuario() {
+        if (usuarioActual == null) {
+            return;
+        }
+
+        if (lblInfoUsuario != null) {
+            lblInfoUsuario.setText("Modo " + usuarioActual.getTipoNegocio().getDescripcion()
+                    + " (" + usuarioActual.getNombre() + ")");
+        }
+
+        if (btnNuevaOrden != null) {
+            if (usuarioActual.getTipoNegocio() == TipoNegocio.PULPERIA) {
+                btnNuevaOrden.setText("Venta Mostrador");
+            } else {
+                btnNuevaOrden.setText("Nueva Orden (Mesa)");
+            }
+        }
     }
 
     /**
@@ -61,11 +100,16 @@ public class MainController {
     }
 
     /**
-     * Muestra la pantalla de toma de pedidos.
+     * Muestra la pantalla de toma de pedidos según el tipo de negocio
+     * del usuario logueado: OrdenPulperiaView o OrdenSodaView.
      */
     @FXML
     public void onMostrarOrdenes() {
-        cargarVista("/cr/ac/una/est/pos/view/OrdenView.fxml");
+        if (usuarioActual != null && usuarioActual.getTipoNegocio() == TipoNegocio.PULPERIA) {
+            cargarVista("/cr/ac/una/est/pos/view/OrdenPulperiaView.fxml");
+        } else {
+            cargarVista("/cr/ac/una/est/pos/view/OrdenSodaView.fxml");
+        }
     }
 
     /**
@@ -81,37 +125,21 @@ public class MainController {
 
     /**
      * Alterna entre el diseño claro original y el modo oscuro.
-     *
-     * El modo claro no utiliza un CSS adicional. Al quitar
-     * dark.css, JavaFX vuelve a utilizar el diseño original
-     * definido por los controles y los FXML.
      */
     @FXML
     private void onCambiarModo() {
-
         Scene escena = panelCentral.getScene();
-
-        String oscuro = getClass()
-                .getResource(CSS_OSCURO)
-                .toExternalForm();
+        String oscuro = getClass().getResource(CSS_OSCURO).toExternalForm();
 
         if (escena.getStylesheets().contains(oscuro)) {
-
-            // Quitar modo oscuro
             escena.getStylesheets().remove(oscuro);
-
         } else {
-
-            // Activar modo oscuro
             escena.getStylesheets().add(oscuro);
         }
     }
 
     /**
-     * Cierra la sesión actual y regresa a la pantalla de login,
-     * reemplazando la escena de la ventana.
-     *
-     * @return no retorna nada
+     * Cierra la sesión actual y regresa a la pantalla de login.
      */
     @FXML
     private void onCerrarSesion() {
@@ -121,7 +149,7 @@ public class MainController {
             );
 
             Stage stage = (Stage) panelCentral.getScene().getWindow();
-
+            stage.setTitle("Sistema POS - Soda o Pulpería");
             stage.setScene(new Scene(login, 750, 500));
 
         } catch (IOException e) {
@@ -131,36 +159,24 @@ public class MainController {
     }
 
     private void cargarVista(String rutaFxml) {
-
         try {
-
             FXMLLoader loader = new FXMLLoader(
                     getClass().getResource(rutaFxml)
             );
 
             Parent vista = loader.load();
-
             Object controlador = loader.getController();
 
             if (controlador instanceof CatalogoController) {
-
-                CatalogoController catalogoController =
-                        (CatalogoController) controlador;
-
+                CatalogoController catalogoController = (CatalogoController) controlador;
                 catalogoController.setProductoService(productoService);
 
             } else if (controlador instanceof ClienteController) {
-
-                ClienteController clienteController =
-                        (ClienteController) controlador;
-
+                ClienteController clienteController = (ClienteController) controlador;
                 clienteController.setClienteService(clienteService);
 
-            } else if (controlador instanceof OrdenController) {
-
-                OrdenController ordenController =
-                        (OrdenController) controlador;
-
+            } else if (controlador instanceof BaseOrdenController) {
+                BaseOrdenController ordenController = (BaseOrdenController) controlador;
                 ordenController.setServicios(
                         productoService,
                         clienteService,
@@ -169,10 +185,7 @@ public class MainController {
                 );
 
             } else if (controlador instanceof FacturaController) {
-
-                FacturaController facturaController =
-                        (FacturaController) controlador;
-
+                FacturaController facturaController = (FacturaController) controlador;
                 facturaController.setOrden(
                         ordenEnFacturacion,
                         productoService,
@@ -183,11 +196,7 @@ public class MainController {
             panelCentral.getChildren().setAll(vista);
 
         } catch (IOException e) {
-
-            System.err.println(
-                    "No se pudo cargar la vista: " + rutaFxml
-            );
-
+            System.err.println("No se pudo cargar la vista: " + rutaFxml);
             e.printStackTrace();
         }
     }
