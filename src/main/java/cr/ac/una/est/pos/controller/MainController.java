@@ -14,7 +14,8 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.layout.StackPane;
 import javafx.stage.Stage;
-
+import javafx.scene.control.ComboBox;
+import javafx.scene.layout.HBox;
 import java.io.IOException;
 
 /**
@@ -33,12 +34,56 @@ public class MainController {
     @FXML private Label lblInfoUsuario;
     @FXML private Button btnNuevaOrden;
 
-    private final ProductoService productoService = new ProductoService();
+    private static final String CSV_PRODUCTOS_SODA = "data/productos_soda.csv";
+    private static final String CSV_PRODUCTOS_PULPERIA = "data/productos_pulperia.csv";
+    private static final String CSV_PEDIDOS_SODA = "data/pedidos_soda.csv";
+    private static final String CSV_PEDIDOS_PULPERIA = "data/pedidos_pulperia.csv";
+
+    @FXML private HBox boxSelectorNegocio;
+    @FXML private ComboBox<TipoNegocio> cbNegocio;
+
+    // Clientes: compartidos por ambos negocios
     private final ClienteService clienteService = new ClienteService();
-    private final OrdenService ordenService = new OrdenService(productoService, clienteService);
+
+    // Servicios de la Soda
+    private final ProductoService productoServiceSoda = new ProductoService(CSV_PRODUCTOS_SODA);
+    private final OrdenService ordenServiceSoda =
+            new OrdenService(productoServiceSoda, clienteService, CSV_PEDIDOS_SODA);
+
+    // Servicios de la Pulpería
+    private final ProductoService productoServicePulperia = new ProductoService(CSV_PRODUCTOS_PULPERIA);
+    private final OrdenService ordenServicePulperia =
+            new OrdenService(productoServicePulperia, clienteService, CSV_PEDIDOS_PULPERIA);
+
+    /** Negocio con el que se está trabajando ahora (fijo para soda/pulpería, elegible para admin). */
+    private TipoNegocio negocioActivo = TipoNegocio.SODA;
 
     private Orden ordenEnFacturacion;
     private Usuario usuarioActual;
+
+    /**
+     * Devuelve el servicio de productos del negocio activo.
+     *
+     * @return ProductoService de la Pulpería o de la Soda según negocioActivo
+     */
+    private ProductoService productoServiceActivo() {
+        if (negocioActivo == TipoNegocio.PULPERIA) {
+            return productoServicePulperia;
+        }
+        return productoServiceSoda;
+    }
+
+    /**
+     * Devuelve el servicio de órdenes del negocio activo.
+     *
+     * @return OrdenService de la Pulpería o de la Soda según negocioActivo
+     */
+    private OrdenService ordenServiceActivo() {
+        if (negocioActivo == TipoNegocio.PULPERIA) {
+            return ordenServicePulperia;
+        }
+        return ordenServiceSoda;
+    }
 
     /**
      * Se ejecuta automáticamente al cargar el FXML.
@@ -46,6 +91,8 @@ public class MainController {
      */
     @FXML
     public void initialize() {
+        cbNegocio.getItems().addAll(TipoNegocio.SODA, TipoNegocio.PULPERIA);
+        cbNegocio.setValue(TipoNegocio.SODA);
         cargarVista("/cr/ac/una/est/pos/view/CatalogoView.fxml");
     }
 
@@ -57,7 +104,15 @@ public class MainController {
      */
     public void setUsuarioActual(Usuario usuario) {
         this.usuarioActual = usuario;
+
+        if (usuario.getTipoNegocio() == TipoNegocio.ADMIN) {
+            negocioActivo = TipoNegocio.SODA;   // el admin arranca en Soda y puede cambiar
+        } else {
+            negocioActivo = usuario.getTipoNegocio();
+        }
+
         actualizarInterfazSegunUsuario();
+        onMostrarCatalogo();   // recarga el catálogo con los servicios del negocio correcto
     }
 
     public Usuario getUsuarioActual() {
@@ -69,13 +124,17 @@ public class MainController {
             return;
         }
 
+        boolean esAdmin = usuarioActual.getTipoNegocio() == TipoNegocio.ADMIN;
+        boxSelectorNegocio.setVisible(esAdmin);
+        boxSelectorNegocio.setManaged(esAdmin);
+
         if (lblInfoUsuario != null) {
-            lblInfoUsuario.setText("Modo " + usuarioActual.getTipoNegocio().getDescripcion()
+            lblInfoUsuario.setText("Modo " + negocioActivo.getDescripcion()
                     + " (" + usuarioActual.getNombre() + ")");
         }
 
         if (btnNuevaOrden != null) {
-            if (usuarioActual.getTipoNegocio() == TipoNegocio.PULPERIA) {
+            if (negocioActivo == TipoNegocio.PULPERIA) {
                 btnNuevaOrden.setText("Venta Mostrador");
             } else {
                 btnNuevaOrden.setText("Nueva Orden (Mesa)");
@@ -105,7 +164,7 @@ public class MainController {
      */
     @FXML
     public void onMostrarOrdenes() {
-        if (usuarioActual != null && usuarioActual.getTipoNegocio() == TipoNegocio.PULPERIA) {
+        if (negocioActivo == TipoNegocio.PULPERIA) {
             cargarVista("/cr/ac/una/est/pos/view/OrdenPulperiaView.fxml");
         } else {
             cargarVista("/cr/ac/una/est/pos/view/OrdenSodaView.fxml");
@@ -169,7 +228,7 @@ public class MainController {
 
             if (controlador instanceof CatalogoController) {
                 CatalogoController catalogoController = (CatalogoController) controlador;
-                catalogoController.setProductoService(productoService);
+                catalogoController.setProductoService(productoServiceActivo());
 
             } else if (controlador instanceof ClienteController) {
                 ClienteController clienteController = (ClienteController) controlador;
@@ -178,9 +237,9 @@ public class MainController {
             } else if (controlador instanceof BaseOrdenController) {
                 BaseOrdenController ordenController = (BaseOrdenController) controlador;
                 ordenController.setServicios(
-                        productoService,
+                        productoServiceActivo(),
                         clienteService,
-                        ordenService,
+                        ordenServiceActivo(),
                         this
                 );
 
@@ -188,8 +247,8 @@ public class MainController {
                 FacturaController facturaController = (FacturaController) controlador;
                 facturaController.setOrden(
                         ordenEnFacturacion,
-                        productoService,
-                        ordenService
+                        productoServiceActivo(),
+                        ordenServiceActivo()
                 );
             }
 
@@ -199,5 +258,19 @@ public class MainController {
             System.err.println("No se pudo cargar la vista: " + rutaFxml);
             e.printStackTrace();
         }
+    }
+    /**
+     * Se ejecuta cuando el administrador elige Soda o Pulpería en el selector.
+     * Cambia el negocio activo, ajusta los textos y vuelve al catálogo de ese negocio.
+     */
+    @FXML
+    private void onCambiarNegocio() {
+        TipoNegocio elegido = cbNegocio.getValue();
+        if (elegido == null || elegido == negocioActivo) {
+            return;
+        }
+        negocioActivo = elegido;
+        actualizarInterfazSegunUsuario();
+        onMostrarCatalogo();
     }
 }

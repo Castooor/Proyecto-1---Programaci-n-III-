@@ -7,7 +7,8 @@ package cr.ac.una.est.pos.model;
  */
 public enum TipoNegocio {
     SODA("Soda"),
-    PULPERIA("Pulpería");
+    PULPERIA("Pulpería"),
+    ADMIN("Administrador");
 
     private final String descripcion;
 

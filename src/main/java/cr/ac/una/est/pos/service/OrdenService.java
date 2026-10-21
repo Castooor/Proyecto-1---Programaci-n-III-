@@ -18,16 +18,23 @@ import java.util.ArrayList;
 
 public class OrdenService {
 
-    private static final String RUTA_ARCHIVO = "data/pedidos.csv";
-
     private ProductoService productoService;
     private ClienteService clienteService;
     private ArrayList<Orden> pedidos;
     private int siguienteId = 1;
+    private final String rutaArchivo;
 
-    public OrdenService(ProductoService productoService, ClienteService clienteService) {
+    /**
+     * Crea el servicio de órdenes de un negocio, con su propio archivo de pedidos.
+     *
+     * @param productoService servicio de productos del mismo negocio
+     * @param clienteService servicio de clientes (compartido)
+     * @param rutaArchivo ruta del CSV de pedidos (ej. "data/pedidos_soda.csv")
+     */
+    public OrdenService(ProductoService productoService, ClienteService clienteService, String rutaArchivo) {
         this.productoService = productoService;
         this.clienteService = clienteService;
+        this.rutaArchivo = rutaArchivo;
         this.pedidos = new ArrayList<>();
         cargarPedidos();
 
@@ -91,7 +98,7 @@ public class OrdenService {
 
     /**
      * Le asigna un id al pedido, lo agrega al historial en memoria
-     * y reescribe pedidos.csv. Se llama cuando se confirma el pago.
+     * y reescribe pedidos_soda.csv. Se llama cuando se confirma el pago.
      */
     public void finalizarPedido(Orden orden) {
         orden.setId(siguienteId);
@@ -110,7 +117,7 @@ public class OrdenService {
      * (aqui si usamos coma porque el punto y coma ya separa las columnas)
      */
     private void guardarPedidos() {
-        File archivo = new File(RUTA_ARCHIVO);
+        File archivo = new File(rutaArchivo);
         File carpeta = archivo.getParentFile();
         if (carpeta != null && !carpeta.exists()) {
             carpeta.mkdirs();
@@ -154,13 +161,13 @@ public class OrdenService {
             escritor.close();
 
         } catch (IOException e) {
-            System.err.println("No se pudo guardar " + RUTA_ARCHIVO);
+            System.err.println("No se pudo guardar " + rutaArchivo);
             e.printStackTrace();
         }
     }
 
     private void cargarPedidos() {
-        File archivo = new File(RUTA_ARCHIVO);
+        File archivo = new File(rutaArchivo);
         if (!archivo.exists()) {
             return;
         }
@@ -181,7 +188,7 @@ public class OrdenService {
             lector.close();
 
         } catch (IOException e) {
-            System.err.println("No se pudo leer " + RUTA_ARCHIVO);
+            System.err.println("No se pudo leer " + rutaArchivo);
             e.printStackTrace();
         }
     }

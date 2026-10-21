@@ -31,7 +31,7 @@ public class UsuarioService {
         if (usuarios.isEmpty()) {
             usuarios.add(new Usuario("admin", "admin123", TipoNegocio.SODA));
             usuarios.add(new Usuario("pulperia", "admin123", TipoNegocio.PULPERIA));
-            usuarios.add(new Usuario("soda", "admin123", TipoNegocio.SODA));
+            usuarios.add(new Usuario("admin", "admin123", TipoNegocio.ADMIN));
             guardarUsuarios();
         }
     }
