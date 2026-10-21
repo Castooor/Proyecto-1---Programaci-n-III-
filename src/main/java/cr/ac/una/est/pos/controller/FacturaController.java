@@ -1,11 +1,11 @@
 package cr.ac.una.est.pos.controller;
 
+import cr.ac.una.est.pos.model.ItemOrden;
 import cr.ac.una.est.pos.model.Orden;
 import cr.ac.una.est.pos.model.Pago;
-import cr.ac.una.est.pos.service.ProductoService;
-import cr.ac.una.est.pos.model.ItemOrden;
-import cr.ac.una.est.pos.model.PagoEfectivo;
 import cr.ac.una.est.pos.service.FacturaService;
+import cr.ac.una.est.pos.service.OrdenService;
+import cr.ac.una.est.pos.service.ProductoService;
 import javafx.fxml.FXML;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Label;
@@ -34,6 +34,7 @@ public class FacturaController {
 
     @FXML private Label lblResultado;
     private ProductoService productoService;
+    private OrdenService ordenService;
     private boolean yaFacturado = false;
     private FacturaService facturaService;
     private Orden orden;
@@ -60,11 +61,14 @@ public class FacturaController {
      * subtotal, IVA y total.
      *
      * @param orden la orden a facturar
+     * @param productoService el servicio de productos para actualizar stock
+     * @param ordenService el servicio de órdenes para registrar el pedido facturado
      * @return no retorna nada
      */
-    public void setOrden(Orden orden, ProductoService productoService) {
+    public void setOrden(Orden orden, ProductoService productoService, OrdenService ordenService) {
         this.orden = orden;
         this.productoService = productoService;
+        this.ordenService = ordenService;
         lblResumenOrden.setText(orden.generarResumen());
         lblSubtotal.setText(String.format("₡%.2f", orden.calcularSubtotal()));
         lblEnvio.setText(String.format("₡%.2f", orden.calcularCostoAdicional()));
@@ -102,6 +106,7 @@ public class FacturaController {
             for (ItemOrden item : orden.getItems()) {
                 productoService.descontarInventario(item.getProducto(), item.getCantidad());
             }
+            ordenService.finalizarPedido(orden);
             yaFacturado = true;
 
             lblResultado.setText("¡Factura completada! Inventario actualizado.\n" + pago.generarResumen());

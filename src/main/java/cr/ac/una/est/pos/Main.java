@@ -29,7 +29,7 @@ public class Main extends Application {
         });
 
         Parent root = FXMLLoader.load(
-                getClass().getResource("/cr/ac/una/est/pos/view/MainView.fxml")
+                getClass().getResource("/cr/ac/una/est/pos/view/LoginView.fxml")
         );
 
         Scene scene = new Scene(root);
