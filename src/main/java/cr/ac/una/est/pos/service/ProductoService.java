@@ -13,11 +13,18 @@ import java.util.ArrayList;
 
 public class ProductoService {
 
-    private static final String RUTA_ARCHIVO = "data/productos.csv";
+    private final String rutaArchivo;
 
     private RepositorioGenerico<Producto> repositorio;
 
-    public ProductoService() {
+    /**
+     * Crea el servicio de productos asociado a un archivo CSV específico,
+     * lo que permite tener un catálogo separado por negocio.
+     *
+     * @param rutaArchivo ruta del CSV (ej. "data/productos_soda.csv")
+     */
+    public ProductoService(String rutaArchivo) {
+        this.rutaArchivo = rutaArchivo;
         this.repositorio = new RepositorioGenerico<>();
         cargarProductos();
     }
@@ -74,12 +81,12 @@ public class ProductoService {
     }
 
     /**
-     * Lee data/productos.csv linea por linea y arma la lista de productos.
+     * Lee data/productos_soda.csv linea por linea y arma la lista de productos.
      * Formato de cada linea: codigo;nombre;categoria;precio;cantidadInventario
      * Si el archivo no existe (primera vez), no hace nada.
      */
     private void cargarProductos() {
-        File archivo = new File(RUTA_ARCHIVO);
+        File archivo = new File(rutaArchivo);
         if (!archivo.exists()) {
             return;
         }
@@ -105,17 +112,17 @@ public class ProductoService {
             lector.close();
 
         } catch (IOException e) {
-            System.err.println("No se pudo leer " + RUTA_ARCHIVO);
+            System.err.println("No se pudo leer " + rutaArchivo);
             e.printStackTrace();
         }
     }
 
     /**
-     * Escribe todos los productos actuales en data/productos.csv,
+     * Escribe todos los productos actuales en data/productos_soda.csv,
      * sobrescribiendo el archivo. Se llama despues de cada cambio.
      */
     private void guardarProductos() {
-        File archivo = new File(RUTA_ARCHIVO);
+        File archivo = new File(rutaArchivo);
         File carpeta = archivo.getParentFile();
         if (carpeta != null && !carpeta.exists()) {
             carpeta.mkdirs();
@@ -134,7 +141,7 @@ public class ProductoService {
             escritor.close();
 
         } catch (IOException e) {
-            System.err.println("No se pudo guardar " + RUTA_ARCHIVO);
+            System.err.println("No se pudo guardar " + rutaArchivo);
             e.printStackTrace();
         }
     }
