@@ -15,14 +15,21 @@ import javafx.scene.control.cell.PropertyValueFactory;
  */
 public class ClienteController {
 
-    @FXML private TextField txtCedula;
-    @FXML private TextField txtNombre;
-    @FXML private TextField txtTelefono;
+    @FXML
+    private TextField txtCedula;
+    @FXML
+    private TextField txtNombre;
+    @FXML
+    private TextField txtTelefono;
 
-    @FXML private TableView<Cliente> tablaClientes;
-    @FXML private TableColumn<Cliente, String> colCedula;
-    @FXML private TableColumn<Cliente, String> colNombre;
-    @FXML private TableColumn<Cliente, String> colTelefono;
+    @FXML
+    private TableView<Cliente> tablaClientes;
+    @FXML
+    private TableColumn<Cliente, String> colCedula;
+    @FXML
+    private TableColumn<Cliente, String> colNombre;
+    @FXML
+    private TableColumn<Cliente, String> colTelefono;
 
     private ClienteService clienteService;
     private ObservableList<Cliente> listaObservable;
@@ -76,6 +83,15 @@ public class ClienteController {
             if (txtCedula.getText().isBlank() || txtNombre.getText().isBlank()) {
                 throw new IllegalArgumentException("Cédula y nombre son obligatorios.");
             }
+            if (!esNumerico(txtCedula.getText())) {
+                throw new IllegalArgumentException("La cédula debe contener solo números.");
+            }
+            if (!esSoloLetras(txtNombre.getText())) {
+                throw new IllegalArgumentException("El nombre debe contener solo letras.");
+            }
+            if (!txtTelefono.getText().isBlank() && !esNumerico(txtTelefono.getText())) {
+                throw new IllegalArgumentException("El teléfono debe contener solo números.");
+            }
             Cliente cliente = new Cliente(txtCedula.getText(), txtNombre.getText(), txtTelefono.getText());
             clienteService.crear(cliente);
             refrescarTabla();
@@ -94,6 +110,18 @@ public class ClienteController {
     @FXML
     public void onActualizar() {
         try {
+            if (txtCedula.getText().isBlank() || txtNombre.getText().isBlank()) {
+                throw new IllegalArgumentException("Cédula y nombre son obligatorios.");
+            }
+            if (!esNumerico(txtCedula.getText())) {
+                throw new IllegalArgumentException("La cédula debe contener solo números.");
+            }
+            if (!esSoloLetras(txtNombre.getText())) {
+                throw new IllegalArgumentException("El nombre debe contener solo letras.");
+            }
+            if (!txtTelefono.getText().isBlank() && !esNumerico(txtTelefono.getText())) {
+                throw new IllegalArgumentException("El teléfono debe contener solo números.");
+            }
             clienteService.actualizar(txtCedula.getText(), txtNombre.getText(), txtTelefono.getText());
             refrescarTabla();
             onLimpiar();
@@ -163,5 +191,27 @@ public class ClienteController {
         Alert alerta = new Alert(Alert.AlertType.ERROR, mensaje);
         alerta.setTitle("Error");
         alerta.showAndWait();
+    }
+
+    /**
+     * Verifica que un texto contenga únicamente dígitos (0-9).
+     * Usado para validar cédula y teléfono.
+     *
+     * @param texto el texto a validar
+     * @return true si el texto contiene solo números, false en caso contrario
+     */
+    private boolean esNumerico(String texto) {
+        return texto.matches("[0-9]+");
+    }
+
+    /**
+     * Verifica que un texto contenga únicamente letras y espacios
+     * (incluye tildes y ñ). Usado para validar el nombre.
+     *
+     * @param texto el texto a validar
+     * @return true si el texto contiene solo letras, false en caso contrario
+     */
+    private boolean esSoloLetras(String texto) {
+        return texto.matches("[a-zA-ZáéíóúÁÉÍÓÚñÑ ]+");
     }
 }

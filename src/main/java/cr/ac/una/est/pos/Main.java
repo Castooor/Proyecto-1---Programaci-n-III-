@@ -1,5 +1,6 @@
 package cr.ac.una.est.pos;
 
+import javafx.scene.image.Image;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
@@ -13,28 +14,41 @@ import javafx.stage.Stage;
 public class Main extends Application {
 
     /**
-     * Punto de entrada de JavaFX. Carga el FXML principal y lo
-     * muestra en la ventana.
+     * Punto de entrada de JavaFX. Configura un manejador de errores
+     * no previstos, carga el FXML principal y lo muestra en la
+     * ventana.
      *
      * @param stage la ventana principal que provee JavaFX
      * @return no retorna nada, solo configura y muestra la ventana
      */
     @Override
     public void start(Stage stage) throws Exception {
-        Parent root = FXMLLoader.load(getClass().getResource("/cr/ac/una/est/pos/view/MainView.fxml"));
+        Thread.setDefaultUncaughtExceptionHandler((thread, excepcion) -> {
+            System.err.println("Error inesperado: " + excepcion.getMessage());
+            excepcion.printStackTrace();
+        });
+
+        Parent root = FXMLLoader.load(
+                getClass().getResource("/cr/ac/una/est/pos/view/LoginView.fxml")
+        );
+
         Scene scene = new Scene(root);
 
         stage.setTitle("Sistema POS - Soda o Pulpería");
+
+        Image icono = new Image(
+                getClass().getResourceAsStream("/images/icono.png")
+        );
+
+        stage.getIcons().add(icono);
         stage.setScene(scene);
         stage.show();
     }
 
     /**
-     * Punto de entrada del programa (el que ejecuta la JVM al inicio).
-     * Delega el arranque a JavaFX mediante launch().
+     * Punto de entrada del programa.
      *
-     * @param args argumentos de línea de comandos (no se usan)
-     * @return no retorna nada
+     * @param args argumentos de línea de comandos
      */
     public static void main(String[] args) {
         launch(args);

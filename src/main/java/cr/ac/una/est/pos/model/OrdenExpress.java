@@ -30,6 +30,16 @@ public class OrdenExpress extends Orden {
     public double calcularCostoAdicional() {
         return COSTO_ENVIO;
     }
+    /**
+     * Genera el resumen de esta orden Express, incluyendo la dirección.
+     *
+     * @return el resumen en texto
+     */
+    @Override
+    public String generarResumen() {
+        return "Orden Express - Entregar en: " + direccion + " - Cliente: " + cliente.getNombre();
+    }
+
 
     /**
      * Obtiene la dirección de entrega de esta orden.

@@ -7,8 +7,9 @@ import java.util.ArrayList;
  * porque toda orden real es, en la práctica, una OrdenLocal o una
  * OrdenExpress — Orden solo agrupa lo que ambas tienen en común.
  */
-public abstract class Orden {
+public abstract class Orden implements Resumible {
 
+    protected int id;
     protected Cliente cliente;
     protected ArrayList<ItemOrden> items;
 
@@ -20,6 +21,21 @@ public abstract class Orden {
     public Orden(Cliente cliente) {
         this.cliente = cliente;
         this.items = new ArrayList<>();
+    }
+
+    /**
+     * Obtiene el identificador consecutivo del pedido (asignado al
+     * facturarlo y guardarlo en el historial).
+     */
+    public int getId() {
+        return id;
+    }
+
+    /**
+     * Asigna el identificador consecutivo del pedido.
+     */
+    public void setId(int id) {
+        this.id = id;
     }
 
     /**
@@ -54,6 +70,15 @@ public abstract class Orden {
      * @return el costo adicional de esta orden
      */
     public abstract double calcularCostoAdicional();
+
+    /**
+     * Genera el resumen de esta orden. Cada subclase lo implementa
+     * de forma distinta porque cada tipo de orden muestra datos
+     * diferentes (mesa o dirección).
+     *
+     * @return el resumen en texto
+     */
+    public abstract String generarResumen();
 
     /**
      * Calcula el total de la orden, incluyendo el costo adicional

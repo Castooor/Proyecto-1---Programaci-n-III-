@@ -28,6 +28,16 @@ public class OrdenLocal extends Orden {
     public double calcularCostoAdicional() {
         return 0;
     }
+    /**
+     * Genera el resumen de esta orden local, incluyendo el número de mesa.
+     *
+     * @return el resumen en texto
+     */
+    @Override
+    public String generarResumen() {
+        return "Orden Local - Mesa " + numeroMesa + " - Cliente: " + cliente.getNombre();
+    }
+
 
     /**
      * Obtiene el número de mesa de esta orden.
@@ -37,4 +47,5 @@ public class OrdenLocal extends Orden {
     public int getNumeroMesa() {
         return numeroMesa;
     }
+
 }
