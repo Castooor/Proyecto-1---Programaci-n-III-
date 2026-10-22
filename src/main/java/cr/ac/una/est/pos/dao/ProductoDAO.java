@@ -19,12 +19,13 @@ public interface ProductoDAO {
     ArrayList<Producto> listarPorNegocio(TipoNegocio negocio);
 
     /**
-     * Busca un producto por su código.
+     * Busca un producto por su código dentro del catálogo de un negocio.
      *
      * @param codigo código del producto
-     * @return el producto, o null si no existe
+     * @param negocio negocio en cuyo catálogo se busca
+     * @return el producto, o null si no existe en ese negocio
      */
-    Producto buscarPorCodigo(String codigo);
+    Producto buscarPorCodigo(String codigo, TipoNegocio negocio);
 
     /**
      * Guarda un producto nuevo en el catálogo de un negocio.
