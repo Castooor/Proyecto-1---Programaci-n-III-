@@ -1,5 +1,6 @@
 package cr.ac.una.est.pos.controller;
 
+import cr.ac.una.est.pos.dao.DAOException;   // NUEVO
 import cr.ac.una.est.pos.model.Producto;
 import cr.ac.una.est.pos.service.ProductoService;
 import javafx.collections.FXCollections;
@@ -87,6 +88,8 @@ public class CatalogoController {
             mostrarError("Precio e inventario deben ser números válidos.");
         } catch (IllegalArgumentException e) {
             mostrarError(e.getMessage());
+        } catch (DAOException e) {                 // NUEVO
+            mostrarError(e.getMessage());
         }
     }
 
@@ -112,6 +115,8 @@ public class CatalogoController {
             mostrarError("Precio e inventario deben ser números válidos.");
         } catch (IllegalArgumentException e) {
             mostrarError(e.getMessage());
+        } catch (DAOException e) {                 // NUEVO
+            mostrarError(e.getMessage());
         }
     }
 
@@ -127,6 +132,8 @@ public class CatalogoController {
             refrescarTabla();
             onLimpiar();
         } catch (IllegalArgumentException e) {
+            mostrarError(e.getMessage());
+        } catch (DAOException e) {                 // NUEVO
             mostrarError(e.getMessage());
         }
     }
