@@ -19,6 +19,7 @@ import javafx.scene.layout.HBox;
 import java.io.IOException;
 import cr.ac.una.est.pos.dao.ProductoDAO;
 import cr.ac.una.est.pos.dao.jdbc.ProductoDAOJdbc;
+import cr.ac.una.est.pos.dao.jdbc.ClienteDAOJdbc;
 
 /**
  * Controlador de la pantalla principal (contenedora). Es dueño único
@@ -45,7 +46,7 @@ public class MainController {
     @FXML private ComboBox<TipoNegocio> cbNegocio;
 
     // Clientes: compartidos por ambos negocios
-    private final ClienteService clienteService = new ClienteService();
+    private final ClienteService clienteService = new ClienteService(new ClienteDAOJdbc());
 
     // Servicios de la Soda
 

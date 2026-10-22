@@ -1,5 +1,6 @@
 package cr.ac.una.est.pos.controller;
 
+import cr.ac.una.est.pos.dao.DAOException;   // NUEVO
 import cr.ac.una.est.pos.model.Cliente;
 import cr.ac.una.est.pos.service.ClienteService;
 import javafx.collections.FXCollections;
@@ -98,6 +99,8 @@ public class ClienteController {
             onLimpiar();
         } catch (IllegalArgumentException e) {
             mostrarError(e.getMessage());
+        } catch (DAOException e) {                 // NUEVO
+            mostrarError(e.getMessage());
         }
     }
 
@@ -127,6 +130,8 @@ public class ClienteController {
             onLimpiar();
         } catch (IllegalArgumentException e) {
             mostrarError(e.getMessage());
+        } catch (DAOException e) {                 // NUEVO
+            mostrarError(e.getMessage());
         }
     }
 
@@ -142,6 +147,8 @@ public class ClienteController {
             refrescarTabla();
             onLimpiar();
         } catch (IllegalArgumentException e) {
+            mostrarError(e.getMessage());
+        } catch (DAOException e) {                 // NUEVO
             mostrarError(e.getMessage());
         }
     }
