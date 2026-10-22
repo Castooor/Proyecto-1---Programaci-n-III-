@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<BorderPane xmlns="http://javafx.com/javafx"
+            xmlns:fx="http://javafx.com/fxml"
+            fx:controller="cr.ac.una.est.pos.controller.ClienteController"
+            prefWidth="600" prefHeight="420">
+
+    <top>
+        <GridPane hgap="10" vgap="8" BorderPane.alignment="CENTER">
+            <padding>
+                <Insets top="15" right="15" bottom="10" left="15"/>
+            </padding>
+
+            <Label text="Cédula:" GridPane.rowIndex="0" GridPane.columnIndex="0"/>
+            <TextField fx:id="txtCedula" GridPane.rowIndex="0" GridPane.columnIndex="1"/>
+
+            <Label text="Nombre:" GridPane.rowIndex="0" GridPane.columnIndex="2"/>
+            <TextField fx:id="txtNombre" GridPane.rowIndex="0" GridPane.columnIndex="3"/>
+
+            <Label text="Teléfono:" GridPane.rowIndex="1" GridPane.columnIndex="0"/>
+            <TextField fx:id="txtTelefono" GridPane.rowIndex="1" GridPane.columnIndex="1"/>
+
+            <HBox spacing="10" GridPane.rowIndex="2" GridPane.columnIndex="0" GridPane.columnSpan="4">
+                <padding>
+                    <Insets top="10"/>
+                </padding>
+                <Button text="Agregar" onAction="#onAgregar"/>
+                <Button text="Actualizar" onAction="#onActualizar"/>
+                <Button text="Eliminar" onAction="#onEliminar"/>
+                <Button text="Limpiar" onAction="#onLimpiar"/>
+            </HBox>
+        </GridPane>
+    </top>
+
+    <center>
+        <TableView fx:id="tablaClientes" BorderPane.alignment="CENTER">
+            <columns>
+                <TableColumn fx:id="colCedula" text="Cédula" prefWidth="120"/>
+                <TableColumn fx:id="colNombre" text="Nombre" prefWidth="220"/>
+                <TableColumn fx:id="colTelefono" text="Teléfono" prefWidth="140"/>
+            </columns>
+            <BorderPane.margin>
+                <Insets left="15" right="15" bottom="15"/>
+            </BorderPane.margin>
+        </TableView>
+    </center>
+
+</BorderPane>
