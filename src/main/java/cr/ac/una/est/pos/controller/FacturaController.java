@@ -1,5 +1,6 @@
 package cr.ac.una.est.pos.controller;
 
+import cr.ac.una.est.pos.dao.DAOException;   // NUEVO
 import cr.ac.una.est.pos.model.ItemOrden;
 import cr.ac.una.est.pos.model.Orden;
 import cr.ac.una.est.pos.model.Pago;
@@ -113,6 +114,8 @@ public class FacturaController {
         } catch (NumberFormatException e) {
             mostrarError("El monto recibido debe ser un número válido.");
         } catch (IllegalArgumentException e) {
+            mostrarError(e.getMessage());
+        } catch (DAOException e) {                 // NUEVO
             mostrarError(e.getMessage());
         }
     }

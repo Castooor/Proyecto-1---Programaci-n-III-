@@ -17,6 +17,8 @@ import javafx.stage.Stage;
 import javafx.scene.control.ComboBox;
 import javafx.scene.layout.HBox;
 import java.io.IOException;
+import cr.ac.una.est.pos.dao.ProductoDAO;
+import cr.ac.una.est.pos.dao.jdbc.ProductoDAOJdbc;
 
 /**
  * Controlador de la pantalla principal (contenedora). Es dueño único
@@ -34,8 +36,8 @@ public class MainController {
     @FXML private Label lblInfoUsuario;
     @FXML private Button btnNuevaOrden;
 
-    private static final String CSV_PRODUCTOS_SODA = "data/productos_soda.csv";
-    private static final String CSV_PRODUCTOS_PULPERIA = "data/productos_pulperia.csv";
+    // Un solo DAO, compartido por ambos negocios
+    private final ProductoDAO productoDAO = new ProductoDAOJdbc();
     private static final String CSV_PEDIDOS_SODA = "data/pedidos_soda.csv";
     private static final String CSV_PEDIDOS_PULPERIA = "data/pedidos_pulperia.csv";
 
@@ -46,12 +48,13 @@ public class MainController {
     private final ClienteService clienteService = new ClienteService();
 
     // Servicios de la Soda
-    private final ProductoService productoServiceSoda = new ProductoService(CSV_PRODUCTOS_SODA);
+
+    private final ProductoService productoServiceSoda = new ProductoService(productoDAO, TipoNegocio.SODA);
     private final OrdenService ordenServiceSoda =
             new OrdenService(productoServiceSoda, clienteService, CSV_PEDIDOS_SODA);
 
     // Servicios de la Pulpería
-    private final ProductoService productoServicePulperia = new ProductoService(CSV_PRODUCTOS_PULPERIA);
+    private final ProductoService productoServicePulperia = new ProductoService(productoDAO, TipoNegocio.PULPERIA);
     private final OrdenService ordenServicePulperia =
             new OrdenService(productoServicePulperia, clienteService, CSV_PEDIDOS_PULPERIA);
 
