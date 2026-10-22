@@ -54,24 +54,27 @@ public class ProductoDAOJdbc implements ProductoDAO {
     }
 
     /**
-     * Busca un producto por su código.
+     * Busca un producto por su código dentro del catálogo de un negocio.
      *
      * @param codigo código del producto
-     * @return el producto, o null si no existe
+     * @param negocio negocio en cuyo catálogo se busca
+     * @return el producto, o null si no existe en ese negocio
      * @throws DAOException si falla la consulta a la base de datos
      */
     @Override
-    public Producto buscarPorCodigo(String codigo) {
+    public Producto buscarPorCodigo(String codigo, TipoNegocio negocio) {
         String sql = """
-                SELECT codigo, nombre, categoria, precio, inventario
-                FROM producto
-                WHERE codigo = ?
+                SELECT p.codigo, p.nombre, p.categoria, p.precio, p.inventario
+                FROM producto p
+                JOIN negocio n ON p.id_negocio = n.id_negocio
+                WHERE p.codigo = ? AND n.nombre = ?
                 """;
 
         try (Connection con = ConexionBD.obtenerConexion();
              PreparedStatement ps = con.prepareStatement(sql)) {
 
             ps.setString(1, codigo);
+            ps.setString(2, negocio.name());
 
             try (ResultSet rs = ps.executeQuery()) {
                 if (rs.next()) {
