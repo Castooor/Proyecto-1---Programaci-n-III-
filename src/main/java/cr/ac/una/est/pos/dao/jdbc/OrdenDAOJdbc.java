@@ -10,9 +10,25 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 
+/**
+ * Implementación JDBC (MySQL) de OrdenDAO.
+ * Guardar un pedido es una transacción: pedido, detalle, pago e inventario
+ * se guardan juntos o no se guarda nada.
+ */
 public class OrdenDAOJdbc implements OrdenDAO {
 
+    /**
+     * Guarda el pedido, su detalle y su pago, y descuenta el inventario de cada
+     * producto, todo en una sola transacción (con rollback si algo falla).
+     *
+     * @param orden pedido a guardar; al terminar tiene el id generado por la BD
+     * @param negocio negocio (SODA o PULPERIA) que realiza la venta
+     * @param pago pago con el que se cobra el pedido
+     * @throws DAOException si falla la BD o no hay inventario suficiente
+     */
     @Override
     public void insertar(Orden orden, TipoNegocio negocio, Pago pago) throws DAOException {
         String sqlPedido = "INSERT INTO pedido (id_negocio, cedula_cliente, tipo_orden, numero_mesa, direccion, fecha_hora) "
@@ -122,7 +138,55 @@ public class OrdenDAOJdbc implements OrdenDAO {
             }
         }
     }
+    /**
+     * Lista las ventas de un negocio en un día: une pedido, pago y negocio.
+     * Usa un rango de fechas (en vez de DATE()) para aprovechar el índice
+     * idx_pedido_fecha.
+     *
+     * @param negocio negocio a consultar (SODA o PULPERIA)
+     * @param fecha día a consultar
+     * @return ventas del día, de la más reciente a la más antigua
+     * @throws DAOException si falla la base de datos
+     */
+    @Override
+    public List<VentaDia> listarVentasDelDia(TipoNegocio negocio, LocalDate fecha) throws DAOException {
+        String sql = "SELECT p.id_pedido, p.fecha_hora, p.tipo_orden, p.cedula_cliente, pg.metodo, pg.monto "
+                + "FROM pedido p "
+                + "JOIN pago pg ON pg.id_pedido = p.id_pedido "
+                + "JOIN negocio n ON n.id_negocio = p.id_negocio "
+                + "WHERE n.nombre = ? AND p.fecha_hora >= ? AND p.fecha_hora < ? "
+                + "ORDER BY p.fecha_hora DESC";
+        DateTimeFormatter formatoHora = DateTimeFormatter.ofPattern("HH:mm");
+        List<VentaDia> ventas = new ArrayList<>();
+        try (Connection conn = ConexionBD.obtenerConexion();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setString(1, negocio.name());
+            ps.setTimestamp(2, Timestamp.valueOf(fecha.atStartOfDay()));
+            ps.setTimestamp(3, Timestamp.valueOf(fecha.plusDays(1).atStartOfDay()));
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    ventas.add(new VentaDia(
+                            rs.getInt("id_pedido"),
+                            rs.getTimestamp("fecha_hora").toLocalDateTime().format(formatoHora),
+                            rs.getString("tipo_orden"),
+                            rs.getString("cedula_cliente"),
+                            rs.getString("metodo"),
+                            rs.getDouble("monto")));
+                }
+            }
+        } catch (SQLException e) {
+            throw new DAOException("No se pudo generar el reporte de ventas", e);
+        }
+        return ventas;
+    }
 
+    /**
+     * Busca un pedido por su número y le carga sus productos.
+     *
+     * @param id número del pedido
+     * @return el pedido, o Optional vacío si no existe
+     * @throws DAOException si falla la base de datos
+     */
     @Override
     public Optional<Orden> buscarPorId(int id) throws DAOException {
         String sql = "SELECT * FROM pedido WHERE id_pedido = ?";
@@ -143,6 +207,12 @@ public class OrdenDAOJdbc implements OrdenDAO {
         return Optional.empty();
     }
 
+    /**
+     * Lista todos los pedidos con sus productos.
+     *
+     * @return pedidos del más reciente al más antiguo
+     * @throws DAOException si falla la base de datos
+     */
     @Override
     public List<Orden> listarTodas() throws DAOException {
         List<Orden> ordenes = new ArrayList<>();
@@ -162,11 +232,24 @@ public class OrdenDAOJdbc implements OrdenDAO {
         return ordenes;
     }
 
+    /**
+     * Reservado: la tabla pedido todavía no tiene columna de estado, por eso no hace nada.
+     *
+     * @param id número del pedido
+     * @param estado nuevo estado
+     * @throws DAOException nunca se lanza por ahora
+     */
     @Override
     public void actualizarEstado(int id, String estado) throws DAOException {
         // Reservado para actualizar estado en caso de ampliar tabla pedido
     }
 
+    /**
+     * Elimina un pedido; su detalle y su pago se borran en cascada (ON DELETE CASCADE).
+     *
+     * @param id número del pedido a eliminar
+     * @throws DAOException si falla la base de datos
+     */
     @Override
     public void eliminar(int id) throws DAOException {
         String sql = "DELETE FROM pedido WHERE id_pedido = ?";
@@ -180,6 +263,14 @@ public class OrdenDAOJdbc implements OrdenDAO {
         }
     }
 
+    /**
+     * Convierte la fila actual de pedido en una Orden (Express, Local o Mostrador
+     * según tipo_orden). El cliente se arma solo con la cédula guardada.
+     *
+     * @param rs resultado de la consulta, posicionado en una fila de pedido
+     * @return la orden construida, sin productos todavía
+     * @throws SQLException si no se puede leer alguna columna
+     */
     private Orden mapearOrden(ResultSet rs) throws SQLException {
         String tipo = rs.getString("tipo_orden");
         String cedulaCliente = rs.getString("cedula_cliente");
@@ -201,6 +292,13 @@ public class OrdenDAOJdbc implements OrdenDAO {
         return orden;
     }
 
+    /**
+     * Carga los productos de un pedido desde detalle_pedido y los agrega a la orden.
+     *
+     * @param orden orden a la que se le agregan los productos
+     * @param conn conexión abierta que se reutiliza para la consulta
+     * @throws SQLException si falla la consulta
+     */
     private void cargarDetallesEnOrden(Orden orden, Connection conn) throws SQLException {
         String sql = "SELECT d.*, p.nombre FROM detalle_pedido d " +
                 "JOIN producto p ON d.codigo_producto = p.codigo WHERE d.id_pedido = ?";

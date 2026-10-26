@@ -24,9 +24,9 @@ hs_err_pid*
 replay_pid*
 
 #que ignore esto
-   out/
-   target/
-   .idea/
-   .DS_Store
-   *.iml
+out/
+target/
+.idea/
+.DS_Store
+*.iml
 src/main/resources/db.properties

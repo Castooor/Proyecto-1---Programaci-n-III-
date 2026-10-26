@@ -4,6 +4,8 @@ import cr.ac.una.est.pos.model.Usuario;
 import cr.ac.una.est.pos.service.UsuarioService;
 import cr.ac.una.est.pos.dao.DAOException;
 import cr.ac.una.est.pos.dao.jdbc.UsuarioDAOJdbc;
+import cr.ac.una.est.pos.dao.jdbc.LogDAOJdbc;
+import cr.ac.una.est.pos.service.LogService;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
@@ -29,13 +31,23 @@ public class LoginController {
     private Label lblMensaje;
 
     private UsuarioService usuarioService;
+    private LogService logService;
 
+    /**
+     * Se ejecuta al cargar el FXML: crea los servicios de usuarios y bitácora
+     * y limpia el mensaje de error.
+     */
     @FXML
     public void initialize() {
         usuarioService = new UsuarioService(new UsuarioDAOJdbc());
+        logService = new LogService(new LogDAOJdbc());
         lblMensaje.setText("");
     }
 
+    /**
+     * Valida los campos, autentica al usuario contra MySQL y, si es correcto,
+     * abre la pantalla principal. Registra el intento en la bitácora.
+     */
     @FXML
     public void onIngresar() {
         String usuario = txtUsuario.getText() == null ? "" : txtUsuario.getText().trim();
@@ -55,13 +67,21 @@ public class LoginController {
         }
 
         if (usuarioAutenticado != null) {
+            logService.registrar(usuarioAutenticado.getNombre(),
+                    usuarioAutenticado.getTipoNegocio(), "LOGIN", "Inicio de sesión");
             irAPantallaPrincipal(usuarioAutenticado);
         } else {
+            logService.registrar(usuario, null, "LOGIN_FALLIDO", "Credenciales incorrectas");
             mostrarError("Usuario o contraseña incorrectos.");
             txtContrasena.clear();
         }
     }
 
+    /**
+     * Carga la pantalla principal y le entrega el usuario autenticado.
+     *
+     * @param usuario usuario que acaba de iniciar sesión
+     */
     private void irAPantallaPrincipal(Usuario usuario) {
         try {
             if (getClass().getResource("/cr/ac/una/est/pos/view/MainView.fxml") == null) {
@@ -85,6 +105,11 @@ public class LoginController {
         }
     }
 
+    /**
+     * Muestra un mensaje de error debajo de los campos de login.
+     *
+     * @param mensaje texto del error
+     */
     private void mostrarError(String mensaje) {
         lblMensaje.setText(mensaje);
     }

@@ -2,6 +2,7 @@ package cr.ac.una.est.pos.controller;
 
 import cr.ac.una.est.pos.dao.DAOException;   // NUEVO
 import cr.ac.una.est.pos.model.ItemOrden;
+import cr.ac.una.est.pos.service.LogService;
 import cr.ac.una.est.pos.model.Orden;
 import cr.ac.una.est.pos.model.Pago;
 import cr.ac.una.est.pos.service.FacturaService;
@@ -56,6 +57,19 @@ public class FacturaController {
         });
     }
 
+    private LogService logService;
+    private String nombreUsuario;
+
+    /**
+     * Recibe la bitácora y el nombre del usuario que está facturando.
+     *
+     * @param logService servicio de bitácora
+     * @param nombreUsuario nombre del usuario autenticado
+     */
+    public void setContextoLog(LogService logService, String nombreUsuario) {
+        this.logService = logService;
+        this.nombreUsuario = nombreUsuario;
+    }
     /**
      * Recibe la orden a facturar (enviada desde la pantalla de
      * Órdenes a través de MainController) y muestra su resumen,
@@ -66,6 +80,8 @@ public class FacturaController {
      * @param ordenService el servicio de órdenes para registrar el pedido facturado
      * @return no retorna nada
      */
+
+
     public void setOrden(Orden orden, ProductoService productoService, OrdenService ordenService) {
         this.orden = orden;
         this.productoService = productoService;
@@ -105,6 +121,10 @@ public class FacturaController {
             }
 
             ordenService.finalizarPedido(orden, pago);   // pedido + pago + inventario, en una transacción
+            if (logService != null) {
+                logService.registrar(nombreUsuario, ordenService.getNegocio(), "FACTURA",
+                        "Pedido #" + orden.getId() + " por " + String.format("%.2f", pago.getMonto()));
+            }
             yaFacturado = true;
 
             lblResultado.setText("¡Factura completada! Inventario actualizado.\n" + pago.generarResumen());

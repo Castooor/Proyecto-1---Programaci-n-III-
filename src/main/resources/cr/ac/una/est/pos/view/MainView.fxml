@@ -13,6 +13,7 @@
         <HBox spacing="10" alignment="CENTER_LEFT" style="-fx-padding: 10;" styleClass="menu-bar">
             <Button text="Catálogo" onAction="#onMostrarCatalogo"/>
             <Button text="Clientes" onAction="#onMostrarClientes"/>
+            <Button text="Reportes" onAction="#onMostrarReportes"/>
             <Button fx:id="btnNuevaOrden" text="Nueva Orden" onAction="#onMostrarOrdenes"/>
             <Button text="Modo Oscuro/Claro" onAction="#onCambiarModo"/>
             <HBox fx:id="boxSelectorNegocio" spacing="6" alignment="CENTER_LEFT"

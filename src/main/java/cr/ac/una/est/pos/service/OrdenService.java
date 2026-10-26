@@ -10,8 +10,10 @@ import cr.ac.una.est.pos.model.OrdenMostrador;
 import cr.ac.una.est.pos.model.Pago;
 import cr.ac.una.est.pos.model.Producto;
 import cr.ac.una.est.pos.model.TipoNegocio;
+import cr.ac.una.est.pos.model.VentaDia;
 
 import java.util.List;
+import java.time.LocalDate;
 
 /**
  * Lógica de las órdenes de un negocio (Soda o Pulpería): armar el carrito
@@ -127,7 +129,38 @@ public class OrdenService {
             p.setCantidadInventario(p.getCantidadInventario() - item.getCantidad());
         }
     }
+    /**
+     * Devuelve el negocio al que pertenece este servicio.
+     *
+     * @return SODA o PULPERIA
+     */
+    public TipoNegocio getNegocio() {
+        return negocio;
+    }
 
+    /**
+     * Devuelve las ventas de este negocio en un día.
+     *
+     * @param fecha día a consultar
+     * @return ventas del día, de la más reciente a la más antigua
+     */
+    public List<VentaDia> ventasDelDia(LocalDate fecha) {
+        return ordenDAO.listarVentasDelDia(negocio, fecha);
+    }
+
+    /**
+     * Suma el monto de una lista de ventas.
+     *
+     * @param ventas ventas a sumar
+     * @return total vendido
+     */
+    public double totalVentas(List<VentaDia> ventas) {
+        double total = 0;
+        for (VentaDia v : ventas) {
+            total += v.getMonto();
+        }
+        return total;
+    }
     /**
      * Lista todos los pedidos guardados en la base de datos.
      *

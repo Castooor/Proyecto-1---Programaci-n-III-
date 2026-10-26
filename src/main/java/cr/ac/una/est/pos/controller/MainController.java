@@ -6,6 +6,8 @@ import cr.ac.una.est.pos.model.Usuario;
 import cr.ac.una.est.pos.service.ClienteService;
 import cr.ac.una.est.pos.service.OrdenService;
 import cr.ac.una.est.pos.service.ProductoService;
+import cr.ac.una.est.pos.dao.jdbc.LogDAOJdbc;
+import cr.ac.una.est.pos.service.LogService;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
@@ -32,6 +34,8 @@ import cr.ac.una.est.pos.dao.jdbc.ClienteDAOJdbc;
  * (Soda o Pulpería).
  */
 public class MainController {
+
+    private final LogService logService = new LogService(new LogDAOJdbc());
 
     private static final String CSS_OSCURO = "/css/dark.css";
 
@@ -118,11 +122,19 @@ public class MainController {
         actualizarInterfazSegunUsuario();
         onMostrarCatalogo();   // recarga el catálogo con los servicios del negocio correcto
     }
-
+    /**
+     * Devuelve el usuario que inició sesión.
+     *
+     * @return el usuario actual (null si aún no hay sesión)
+     */
     public Usuario getUsuarioActual() {
         return usuarioActual;
     }
 
+    /**
+     * Ajusta la pantalla según el usuario: muestra el selector de negocio solo
+     * al administrador y cambia los textos según el negocio activo.
+     */
     private void actualizarInterfazSegunUsuario() {
         if (usuarioActual == null) {
             return;
@@ -160,6 +172,14 @@ public class MainController {
     @FXML
     public void onMostrarClientes() {
         cargarVista("/cr/ac/una/est/pos/view/ClienteView.fxml");
+    }
+
+    /**
+     * Muestra la pantalla de reportes (ventas del día y bitácora).
+     */
+    @FXML
+    public void onMostrarReportes() {
+        cargarVista("/cr/ac/una/est/pos/view/ReporteView.fxml");
     }
 
     /**
@@ -207,6 +227,9 @@ public class MainController {
     @FXML
     private void onCerrarSesion() {
         try {
+            if (usuarioActual != null) {
+                logService.registrar(usuarioActual.getNombre(), negocioActivo, "LOGOUT", "Cierre de sesión");
+            }
             Parent login = FXMLLoader.load(
                     getClass().getResource("/cr/ac/una/est/pos/view/LoginView.fxml")
             );
@@ -221,6 +244,12 @@ public class MainController {
         }
     }
 
+    /**
+     * Carga una vista FXML en el panel central y le entrega los servicios que
+     * necesita su controlador.
+     *
+     * @param rutaFxml ruta de la vista dentro de los recursos del proyecto
+     */
     private void cargarVista(String rutaFxml) {
         try {
             FXMLLoader loader = new FXMLLoader(
@@ -254,7 +283,15 @@ public class MainController {
                         productoServiceActivo(),
                         ordenServiceActivo()
                 );
-            }
+                facturaController.setContextoLog(logService,
+                        usuarioActual != null ? usuarioActual.getNombre() : "desconocido");
+
+            } else if (controlador instanceof ReporteController) {
+                ((ReporteController) controlador).setServicios(
+                    ordenServiceActivo(),
+                    logService,
+                    usuarioActual != null && usuarioActual.getTipoNegocio() == TipoNegocio.ADMIN);
+        }
 
             panelCentral.getChildren().setAll(vista);
 

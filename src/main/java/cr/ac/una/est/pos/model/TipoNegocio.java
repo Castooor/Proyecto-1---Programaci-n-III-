@@ -16,10 +16,20 @@ public enum TipoNegocio {
         this.descripcion = descripcion;
     }
 
+    /**
+     * Devuelve el nombre legible del tipo de negocio.
+     *
+     * @return la descripción, por ejemplo "Soda" o "Pulpería"
+     */
     public String getDescripcion() {
         return descripcion;
     }
 
+    /**
+     * Devuelve la descripción para mostrarla en listas y selectores.
+     *
+     * @return la descripción del tipo de negocio
+     */
     @Override
     public String toString() {
         return descripcion;

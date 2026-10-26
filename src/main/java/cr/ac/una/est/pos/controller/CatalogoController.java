@@ -198,6 +198,12 @@ public class CatalogoController {
         tablaProductos.setPlaceholder(new Label("Cargando productos..."));
 
         Task<ArrayList<Producto>> tarea = new Task<>() {
+
+            /**
+             * Consulta los productos en el hilo secundario (no en el hilo de JavaFX).
+             *
+             * @return lista de productos del negocio activo
+             */
             @Override
             protected ArrayList<Producto> call() {
                 return productoService.listarTodos();   // consulta en el hilo secundario
