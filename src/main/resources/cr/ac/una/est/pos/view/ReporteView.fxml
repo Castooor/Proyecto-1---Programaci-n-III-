@@ -1,14 +1,52 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import java.lang.*?>
-<?import java.util.*?>
-<?import javafx.scene.*?>
+<?import javafx.geometry.Insets?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
-<AnchorPane xmlns="http://javafx.com/javafx"
-            xmlns:fx="http://javafx.com/fxml"
-            fx:controller="$CONTROLLER_NAME$"
-            prefHeight="400.0" prefWidth="600.0" >
+<TabPane xmlns="http://javafx.com/javafx"
+         xmlns:fx="http://javafx.com/fxml"
+         fx:controller="cr.ac.una.est.pos.controller.ReporteController"
+         tabClosingPolicy="UNAVAILABLE">
 
-</AnchorPane>
+    <Tab text="Ventas del día">
+        <VBox spacing="10">
+            <padding><Insets top="15" right="15" bottom="15" left="15"/></padding>
+            <HBox spacing="10" alignment="CENTER_LEFT">
+                <Label text="Fecha:" style="-fx-font-weight: bold;"/>
+                <DatePicker fx:id="dpFecha"/>
+                <Button text="Consultar" onAction="#onConsultar"/>
+            </HBox>
+            <TableView fx:id="tablaVentas" VBox.vgrow="ALWAYS">
+                <columns>
+                    <TableColumn fx:id="colId" text="Pedido" prefWidth="70"/>
+                    <TableColumn fx:id="colHora" text="Hora" prefWidth="70"/>
+                    <TableColumn fx:id="colTipo" text="Tipo" prefWidth="100"/>
+                    <TableColumn fx:id="colCliente" text="Cliente" prefWidth="130"/>
+                    <TableColumn fx:id="colMetodo" text="Pago" prefWidth="100"/>
+                    <TableColumn fx:id="colMonto" text="Monto" prefWidth="110"/>
+                </columns>
+            </TableView>
+            <Label fx:id="lblResumen" style="-fx-font-weight: bold;"/>
+        </VBox>
+    </Tab>
+
+    <Tab fx:id="tabBitacora" text="Bitácora (admin)">
+        <VBox spacing="10">
+            <padding><Insets top="15" right="15" bottom="15" left="15"/></padding>
+            <HBox spacing="10" alignment="CENTER_LEFT">
+                <Label text="Últimas 50 acciones del sistema" style="-fx-font-weight: bold;"/>
+                <Button text="Actualizar" onAction="#onActualizarBitacora"/>
+            </HBox>
+            <TableView fx:id="tablaBitacora" VBox.vgrow="ALWAYS">
+                <columns>
+                    <TableColumn fx:id="colLogFecha" text="Fecha y hora" prefWidth="150"/>
+                    <TableColumn fx:id="colLogUsuario" text="Usuario" prefWidth="90"/>
+                    <TableColumn fx:id="colLogNegocio" text="Negocio" prefWidth="90"/>
+                    <TableColumn fx:id="colLogAccion" text="Acción" prefWidth="110"/>
+                    <TableColumn fx:id="colLogDetalle" text="Detalle" prefWidth="260"/>
+                </columns>
+            </TableView>
+        </VBox>
+    </Tab>
+</TabPane>

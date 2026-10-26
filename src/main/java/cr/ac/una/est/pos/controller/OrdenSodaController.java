@@ -20,6 +20,9 @@ public class OrdenSodaController extends BaseOrdenController {
     @FXML private Label lblDireccion;
     @FXML private TextField txtDireccion;
 
+    /**
+     * Muestra u oculta los campos de mesa y dirección según el tipo de orden elegido.
+     */
     @Override
     protected void inicializarControlesEspecificos() {
         if (rbLocal != null) {
@@ -27,6 +30,11 @@ public class OrdenSodaController extends BaseOrdenController {
         }
     }
 
+    /**
+     * Muestra el campo de mesa si la orden es Local, o el de dirección si es Express.
+     *
+     * @param esLocal true si la orden es para consumir en una mesa
+     */
     private void actualizarCamposSegunTipo(boolean esLocal) {
         if (lblMesa != null) {
             lblMesa.setVisible(esLocal);
@@ -46,6 +54,10 @@ public class OrdenSodaController extends BaseOrdenController {
         }
     }
 
+    /**
+     * Valida los datos y crea una orden Local (con mesa) o Express (con dirección).
+     * Muestra un error si falta algún dato o el número de mesa no es válido.
+     */
     @Override
     @FXML
     public void onIniciarOrden() {

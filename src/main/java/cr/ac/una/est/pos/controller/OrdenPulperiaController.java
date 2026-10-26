@@ -18,6 +18,9 @@ public class OrdenPulperiaController extends BaseOrdenController {
     @FXML private Label lblDireccion;
     @FXML private TextField txtDireccion;
 
+    /**
+     * Muestra el campo de dirección solo cuando la orden es Express.
+     */
     @Override
     protected void inicializarControlesEspecificos() {
         if (rbExpress != null) {
@@ -34,6 +37,10 @@ public class OrdenPulperiaController extends BaseOrdenController {
         }
     }
 
+    /**
+     * Valida los datos y crea una orden de Mostrador o Express (con dirección).
+     * Muestra un error si falta algún dato.
+     */
     @Override
     @FXML
     public void onIniciarOrden() {

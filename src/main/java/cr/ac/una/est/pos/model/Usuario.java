@@ -7,6 +7,10 @@ package cr.ac.una.est.pos.model;
  */
 public class Usuario {
 
+    /**
+     * Constructor vacío. Crea un usuario sin datos para llenarlo después con los setters
+     * (UsuarioDAOJdbc lo usa al leer una fila de la tabla usuario).
+     */
     public Usuario() {
     }
 
@@ -27,30 +31,65 @@ public class Usuario {
         this.tipoNegocio = tipoNegocio;
     }
 
+    /**
+     * Devuelve el nombre de usuario.
+     *
+     * @return el nombre de usuario
+     */
     public String getNombre() {
         return nombre;
     }
 
+    /**
+     * Cambia el nombre de usuario.
+     *
+     * @param nombre el nuevo nombre de usuario
+     */
     public void setNombre(String nombre) {
         this.nombre = nombre;
     }
 
+    /**
+     * Devuelve la contraseña del usuario.
+     *
+     * @return la contraseña
+     */
     public String getContrasena() {
         return contrasena;
     }
 
+    /**
+     * Cambia la contraseña del usuario.
+     *
+     * @param contrasena la nueva contraseña
+     */
     public void setContrasena(String contrasena) {
         this.contrasena = contrasena;
     }
 
+    /**
+     * Devuelve el tipo de negocio asignado al usuario.
+     *
+     * @return SODA, PULPERIA o ADMIN
+     */
     public TipoNegocio getTipoNegocio() {
         return tipoNegocio;
     }
 
+    /**
+     * Cambia el tipo de negocio asignado al usuario.
+     *
+     * @param tipoNegocio el nuevo tipo de negocio
+     */
     public void setTipoNegocio(TipoNegocio tipoNegocio) {
         this.tipoNegocio = tipoNegocio;
     }
 
+    /**
+     * Devuelve una descripción legible del usuario, por ejemplo "soda (Soda)".
+     *
+     * @return el nombre seguido del tipo de negocio entre paréntesis
+     */
     @Override
     public String toString() {
         return nombre + " (" + (tipoNegocio != null ? tipoNegocio.getDescripcion() : "Sin asignar") + ")";

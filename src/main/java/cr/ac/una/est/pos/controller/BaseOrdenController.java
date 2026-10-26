@@ -7,6 +7,7 @@ import cr.ac.una.est.pos.model.Producto;
 import cr.ac.una.est.pos.service.ClienteService;
 import cr.ac.una.est.pos.service.OrdenService;
 import cr.ac.una.est.pos.service.ProductoService;
+import cr.ac.una.est.pos.dao.DAOException;
 import javafx.beans.property.SimpleDoubleProperty;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleStringProperty;
@@ -93,13 +94,17 @@ public abstract class BaseOrdenController {
         this.ordenService = ordenService;
         this.mainController = mainController;
 
-        listaCatalogo.setAll(productoService.listarTodos());
+        try {
+            listaCatalogo.setAll(productoService.listarTodos());
 
-        ObservableList<Cliente> clientes = FXCollections.observableArrayList();
-        clientes.add(Cliente.clienteGenerico());
-        clientes.addAll(clienteService.listarTodos());
-        cbCliente.setItems(clientes);
-        cbCliente.getSelectionModel().selectFirst();
+            ObservableList<Cliente> clientes = FXCollections.observableArrayList();
+            clientes.add(Cliente.clienteGenerico());
+            clientes.addAll(clienteService.listarTodos());
+            cbCliente.setItems(clientes);
+            cbCliente.getSelectionModel().selectFirst();
+        } catch (DAOException e) {
+            mostrarError("No se pudo cargar la información: " + e.getMessage());
+        }
     }
 
     /**
@@ -172,12 +177,22 @@ public abstract class BaseOrdenController {
         lblSubtotal.setText(String.format("Subtotal: ₡%.2f", subtotal));
     }
 
+    /**
+     * Muestra una ventana de error.
+     *
+     * @param mensaje texto del error
+     */
     protected void mostrarError(String mensaje) {
         Alert alerta = new Alert(Alert.AlertType.ERROR, mensaje);
         alerta.setTitle("Error");
         alerta.showAndWait();
     }
 
+    /**
+     * Muestra una ventana informativa.
+     *
+     * @param mensaje texto a mostrar
+     */
     protected void mostrarInfo(String mensaje) {
         Alert alerta = new Alert(Alert.AlertType.INFORMATION, mensaje);
         alerta.setTitle("Información");
