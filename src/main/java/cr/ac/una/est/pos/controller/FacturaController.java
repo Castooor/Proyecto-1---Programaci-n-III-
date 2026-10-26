@@ -104,10 +104,7 @@ public class FacturaController {
                 pago = facturaService.crearPagoSinpe(orden);
             }
 
-            for (ItemOrden item : orden.getItems()) {
-                productoService.descontarInventario(item.getProducto(), item.getCantidad());
-            }
-            ordenService.finalizarPedido(orden);
+            ordenService.finalizarPedido(orden, pago);   // pedido + pago + inventario, en una transacción
             yaFacturado = true;
 
             lblResultado.setText("¡Factura completada! Inventario actualizado.\n" + pago.generarResumen());

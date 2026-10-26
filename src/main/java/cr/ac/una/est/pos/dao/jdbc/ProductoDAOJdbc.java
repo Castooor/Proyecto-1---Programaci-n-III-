@@ -44,11 +44,11 @@ public class ProductoDAOJdbc implements ProductoDAO {
 
             try (ResultSet rs = ps.executeQuery()) {
                 while (rs.next()) {
-                    productos.add(crearProducto(rs));
+                    productos.add(crearProducto(rs, negocio));
                 }
             }
         } catch (SQLException e) {
-            throw new DAOException("No se pudo cargar el catálogo de " + negocio.getDescripcion(), e);
+            throw new DAOException("No se pudo cargar el catálogo de " + negocio.name(), e);
         }
         return productos;
     }
@@ -78,7 +78,7 @@ public class ProductoDAOJdbc implements ProductoDAO {
 
             try (ResultSet rs = ps.executeQuery()) {
                 if (rs.next()) {
-                    return crearProducto(rs);
+                    return crearProducto(rs, negocio);
                 }
                 return null;
             }
@@ -202,15 +202,19 @@ public class ProductoDAOJdbc implements ProductoDAO {
      * Convierte la fila actual del ResultSet en un objeto Producto.
      *
      * @param rs resultado de una consulta, posicionado en una fila válida
+     * @param negocio tipo de negocio al que pertenece el producto
      * @return producto con los datos de esa fila
      * @throws SQLException si alguna columna no se puede leer
      */
-    private Producto crearProducto(ResultSet rs) throws SQLException {
-        return new Producto(
+    private Producto crearProducto(ResultSet rs, TipoNegocio negocio) throws SQLException {
+        Producto p = new Producto(
                 rs.getString("codigo"),
                 rs.getString("nombre"),
                 rs.getString("categoria"),
                 rs.getDouble("precio"),
-                rs.getInt("inventario"));
+                1); // Se envía 1 como entero requerida por el constructor
+
+        p.setCantidadInventario(rs.getInt("inventario"));
+        return p;
     }
 }

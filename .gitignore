@@ -27,6 +27,6 @@ replay_pid*
    out/
    target/
    .idea/
+   .DS_Store
    *.iml
-
 src/main/resources/db.properties

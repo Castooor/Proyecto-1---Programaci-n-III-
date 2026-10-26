@@ -18,6 +18,8 @@ import javafx.scene.control.ComboBox;
 import javafx.scene.layout.HBox;
 import java.io.IOException;
 import cr.ac.una.est.pos.dao.ProductoDAO;
+import cr.ac.una.est.pos.dao.OrdenDAO;
+import cr.ac.una.est.pos.dao.jdbc.OrdenDAOJdbc;
 import cr.ac.una.est.pos.dao.jdbc.ProductoDAOJdbc;
 import cr.ac.una.est.pos.dao.jdbc.ClienteDAOJdbc;
 
@@ -37,10 +39,9 @@ public class MainController {
     @FXML private Label lblInfoUsuario;
     @FXML private Button btnNuevaOrden;
 
-    // Un solo DAO, compartido por ambos negocios
+    // Un solo DAO por entidad, compartido por ambos negocios
     private final ProductoDAO productoDAO = new ProductoDAOJdbc();
-    private static final String CSV_PEDIDOS_SODA = "data/pedidos_soda.csv";
-    private static final String CSV_PEDIDOS_PULPERIA = "data/pedidos_pulperia.csv";
+    private final OrdenDAO ordenDAO = new OrdenDAOJdbc();
 
     @FXML private HBox boxSelectorNegocio;
     @FXML private ComboBox<TipoNegocio> cbNegocio;
@@ -49,15 +50,14 @@ public class MainController {
     private final ClienteService clienteService = new ClienteService(new ClienteDAOJdbc());
 
     // Servicios de la Soda
-
     private final ProductoService productoServiceSoda = new ProductoService(productoDAO, TipoNegocio.SODA);
     private final OrdenService ordenServiceSoda =
-            new OrdenService(productoServiceSoda, clienteService, CSV_PEDIDOS_SODA);
+            new OrdenService(productoServiceSoda, clienteService, ordenDAO, TipoNegocio.SODA);
 
     // Servicios de la Pulpería
     private final ProductoService productoServicePulperia = new ProductoService(productoDAO, TipoNegocio.PULPERIA);
     private final OrdenService ordenServicePulperia =
-            new OrdenService(productoServicePulperia, clienteService, CSV_PEDIDOS_PULPERIA);
+            new OrdenService(productoServicePulperia, clienteService, ordenDAO, TipoNegocio.PULPERIA);
 
     /** Negocio con el que se está trabajando ahora (fijo para soda/pulpería, elegible para admin). */
     private TipoNegocio negocioActivo = TipoNegocio.SODA;
