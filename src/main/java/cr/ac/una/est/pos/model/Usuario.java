@@ -7,6 +7,9 @@ package cr.ac.una.est.pos.model;
  */
 public class Usuario {
 
+    public Usuario() {
+    }
+
     private String nombre;
     private String contrasena;
     private TipoNegocio tipoNegocio;

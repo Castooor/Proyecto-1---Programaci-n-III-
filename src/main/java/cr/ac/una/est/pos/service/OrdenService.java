@@ -1,62 +1,85 @@
 package cr.ac.una.est.pos.service;
 
+import cr.ac.una.est.pos.dao.OrdenDAO;
 import cr.ac.una.est.pos.model.Cliente;
 import cr.ac.una.est.pos.model.ItemOrden;
 import cr.ac.una.est.pos.model.Orden;
 import cr.ac.una.est.pos.model.OrdenExpress;
 import cr.ac.una.est.pos.model.OrdenLocal;
 import cr.ac.una.est.pos.model.OrdenMostrador;
+import cr.ac.una.est.pos.model.Pago;
 import cr.ac.una.est.pos.model.Producto;
+import cr.ac.una.est.pos.model.TipoNegocio;
 
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileReader;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.util.ArrayList;
+import java.util.List;
 
+/**
+ * Lógica de las órdenes de un negocio (Soda o Pulpería): armar el carrito
+ * y guardar el pedido facturado mediante un OrdenDAO.
+ */
 public class OrdenService {
 
-    private ProductoService productoService;
-    private ClienteService clienteService;
-    private ArrayList<Orden> pedidos;
-    private int siguienteId = 1;
-    private final String rutaArchivo;
+    private final ProductoService productoService;
+    private final ClienteService clienteService;
+    private final OrdenDAO ordenDAO;
+    private final TipoNegocio negocio;
 
     /**
-     * Crea el servicio de órdenes de un negocio, con su propio archivo de pedidos.
+     * Crea el servicio de órdenes de un negocio.
      *
      * @param productoService servicio de productos del mismo negocio
      * @param clienteService servicio de clientes (compartido)
-     * @param rutaArchivo ruta del CSV de pedidos (ej. "data/pedidos_soda.csv")
+     * @param ordenDAO acceso a datos de pedidos
+     * @param negocio negocio al que pertenecen los pedidos de este servicio
      */
-    public OrdenService(ProductoService productoService, ClienteService clienteService, String rutaArchivo) {
+    public OrdenService(ProductoService productoService, ClienteService clienteService,
+                        OrdenDAO ordenDAO, TipoNegocio negocio) {
         this.productoService = productoService;
         this.clienteService = clienteService;
-        this.rutaArchivo = rutaArchivo;
-        this.pedidos = new ArrayList<>();
-        cargarPedidos();
-
-        for (Orden pedido : pedidos) {
-            if (pedido.getId() >= siguienteId) {
-                siguienteId = pedido.getId() + 1;
-            }
-        }
+        this.ordenDAO = ordenDAO;
+        this.negocio = negocio;
     }
 
+    /**
+     * Crea una orden para consumir en una mesa.
+     *
+     * @param cliente cliente de la orden
+     * @param numeroMesa número de mesa
+     * @return la orden creada
+     */
     public Orden crearOrdenLocal(Cliente cliente, int numeroMesa) {
         return new OrdenLocal(cliente, numeroMesa);
     }
 
+    /**
+     * Crea una orden express (a domicilio).
+     *
+     * @param cliente cliente de la orden
+     * @param direccion dirección de entrega
+     * @return la orden creada
+     */
     public Orden crearOrdenExpress(Cliente cliente, String direccion) {
         return new OrdenExpress(cliente, direccion);
     }
 
+    /**
+     * Crea una orden de mostrador.
+     *
+     * @param cliente cliente de la orden
+     * @return la orden creada
+     */
     public Orden crearOrdenMostrador(Cliente cliente) {
         return new OrdenMostrador(cliente);
     }
 
+    /**
+     * Agrega un producto al carrito validando cantidad e inventario.
+     *
+     * @param orden orden en construcción
+     * @param producto producto a agregar
+     * @param cantidad unidades a agregar
+     * @throws IllegalArgumentException si la cantidad es inválida o excede el inventario
+     */
     public void agregarProducto(Orden orden, Producto producto, int cantidad) {
         if (cantidad <= 0) {
             throw new IllegalArgumentException("La cantidad debe ser mayor a cero.");
@@ -75,6 +98,12 @@ public class OrdenService {
         }
     }
 
+    /**
+     * Quita un producto del carrito.
+     *
+     * @param orden orden en construcción
+     * @param producto producto a quitar
+     */
     public void quitarProducto(Orden orden, Producto producto) {
         ItemOrden item = buscarItem(orden, producto);
         if (item != null) {
@@ -82,11 +111,51 @@ public class OrdenService {
         }
     }
 
+    /**
+     * Guarda el pedido en la base de datos junto con su pago y el descuento
+     * de inventario (una sola transacción). Se llama al confirmar el pago.
+     *
+     * @param orden orden a guardar; recibe el id generado por la BD
+     * @param pago pago con el que se cobró
+     * @throws cr.ac.una.est.pos.dao.DAOException si falla la BD o no hay inventario
+     */
+    public void finalizarPedido(Orden orden, Pago pago) {
+        ordenDAO.insertar(orden, negocio, pago);
+        // La BD ya descontó el inventario; sincronizamos los objetos en memoria
+        for (ItemOrden item : orden.getItems()) {
+            Producto p = item.getProducto();
+            p.setCantidadInventario(p.getCantidadInventario() - item.getCantidad());
+        }
+    }
+
+    /**
+     * Lista todos los pedidos guardados en la base de datos.
+     *
+     * @return lista de pedidos, del más reciente al más antiguo
+     */
+    public List<Orden> listarPedidos() {
+        return ordenDAO.listarTodas();
+    }
+
+    /**
+     * Cuenta cuántas unidades de un producto hay ya en el carrito.
+     *
+     * @param orden orden en construcción
+     * @param producto producto a buscar
+     * @return cantidad en el carrito (0 si no está)
+     */
     private int cantidadEnCarrito(Orden orden, Producto producto) {
         ItemOrden item = buscarItem(orden, producto);
         return item == null ? 0 : item.getCantidad();
     }
 
+    /**
+     * Busca el ítem de un producto dentro de la orden.
+     *
+     * @param orden orden en construcción
+     * @param producto producto a buscar
+     * @return el ítem, o null si no está en la orden
+     */
     private ItemOrden buscarItem(Orden orden, Producto producto) {
         for (ItemOrden item : orden.getItems()) {
             if (item.getProducto().getCodigo().equals(producto.getCodigo())) {
@@ -94,147 +163,5 @@ public class OrdenService {
             }
         }
         return null;
-    }
-
-    /**
-     * Le asigna un id al pedido, lo agrega al historial en memoria
-     * y reescribe pedidos_soda.csv. Se llama cuando se confirma el pago.
-     */
-    public void finalizarPedido(Orden orden) {
-        orden.setId(siguienteId);
-        siguienteId = siguienteId + 1;
-        pedidos.add(orden);
-        guardarPedidos();
-    }
-
-    public ArrayList<Orden> listarPedidos() {
-        return pedidos;
-    }
-
-    /**
-     * Formato de cada linea: id;tipo;cedulaCliente;mesaODireccion;items
-     * items va codificado como "codigo-cantidad,codigo-cantidad"
-     * (aqui si usamos coma porque el punto y coma ya separa las columnas)
-     */
-    private void guardarPedidos() {
-        File archivo = new File(rutaArchivo);
-        File carpeta = archivo.getParentFile();
-        if (carpeta != null && !carpeta.exists()) {
-            carpeta.mkdirs();
-        }
-
-        try {
-            BufferedWriter escritor = new BufferedWriter(new FileWriter(archivo));
-
-            for (Orden orden : pedidos) {
-                String tipo;
-                String mesaODireccion;
-
-                if (orden instanceof OrdenLocal) {
-                    OrdenLocal local = (OrdenLocal) orden;
-                    tipo = "LOCAL";
-                    mesaODireccion = String.valueOf(local.getNumeroMesa());
-                } else if (orden instanceof OrdenExpress) {
-                    OrdenExpress express = (OrdenExpress) orden;
-                    tipo = "EXPRESS";
-                    mesaODireccion = express.getDireccion();
-                } else {
-                    tipo = "MOSTRADOR";
-                    mesaODireccion = "N/A";
-                }
-
-                String items = "";
-                for (ItemOrden item : orden.getItems()) {
-                    if (!items.isEmpty()) {
-                        items = items + ",";
-                    }
-                    items = items + item.getProducto().getCodigo() + "-" + item.getCantidad();
-                }
-
-                String linea = orden.getId() + ";" + tipo + ";" + orden.getCliente().getCedula()
-                        + ";" + mesaODireccion + ";" + items;
-
-                escritor.write(linea);
-                escritor.newLine();
-            }
-
-            escritor.close();
-
-        } catch (IOException e) {
-            System.err.println("No se pudo guardar " + rutaArchivo);
-            e.printStackTrace();
-        }
-    }
-
-    private void cargarPedidos() {
-        File archivo = new File(rutaArchivo);
-        if (!archivo.exists()) {
-            return;
-        }
-
-        try {
-            BufferedReader lector = new BufferedReader(new FileReader(archivo));
-            String linea = lector.readLine();
-
-            while (linea != null) {
-                if (!linea.isBlank()) {
-                    Orden pedido = convertirLineaAPedido(linea);
-                    if (pedido != null) {
-                        pedidos.add(pedido);
-                    }
-                }
-                linea = lector.readLine();
-            }
-            lector.close();
-
-        } catch (IOException e) {
-            System.err.println("No se pudo leer " + rutaArchivo);
-            e.printStackTrace();
-        }
-    }
-
-    private Orden convertirLineaAPedido(String linea) {
-        String[] partes = linea.split(";", -1);
-        if (partes.length < 5) {
-            return null;
-        }
-
-        int id = Integer.parseInt(partes[0]);
-        String tipo = partes[1];
-        String cedulaCliente = partes[2];
-        String mesaODireccion = partes[3];
-        String itemsTexto = partes[4];
-
-        Cliente cliente = clienteService.buscarPorCedula(cedulaCliente);
-        if (cliente == null) {
-            cliente = Cliente.clienteGenerico();
-        }
-
-        Orden orden;
-        if (tipo.equals("LOCAL")) {
-            int mesa = Integer.parseInt(mesaODireccion);
-            orden = new OrdenLocal(cliente, mesa);
-        } else if (tipo.equals("EXPRESS")) {
-            orden = new OrdenExpress(cliente, mesaODireccion);
-        } else {
-            orden = new OrdenMostrador(cliente);
-        }
-        orden.setId(id);
-
-        if (!itemsTexto.isBlank()) {
-            String[] itemsSeparados = itemsTexto.split(",");
-            for (String itemTexto : itemsSeparados) {
-                String[] codigoYCantidad = itemTexto.split("-");
-                if (codigoYCantidad.length == 2) {
-                    Producto producto = productoService.buscarPorCodigo(codigoYCantidad[0]);
-                    int cantidad = Integer.parseInt(codigoYCantidad[1]);
-                    if (producto != null) {
-                        orden.agregarProducto(producto, cantidad);
-                    }
-                }
-            }
-        }
-
-        return orden;
     }
 }

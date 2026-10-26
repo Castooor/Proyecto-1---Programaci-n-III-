@@ -8,6 +8,8 @@ import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.concurrent.Task;
+import java.util.ArrayList;
 
 /**
  * Controlador de la pantalla de Catálogo de Productos. Conecta los
@@ -188,8 +190,31 @@ public class CatalogoController {
      *
      * @return no retorna nada
      */
+    /**
+     * Recarga la tabla del catálogo desde la base de datos en un hilo aparte,
+     * para que la interfaz no se congele mientras se consulta MySQL.
+     */
     private void refrescarTabla() {
-        listaObservable.setAll(productoService.listarTodos());
+        tablaProductos.setPlaceholder(new Label("Cargando productos..."));
+
+        Task<ArrayList<Producto>> tarea = new Task<>() {
+            @Override
+            protected ArrayList<Producto> call() {
+                return productoService.listarTodos();   // consulta en el hilo secundario
+            }
+        };
+        tarea.setOnSucceeded(e -> {                      // vuelve al hilo de JavaFX
+            listaObservable.setAll(tarea.getValue());
+            tablaProductos.setPlaceholder(new Label("No hay productos"));
+        });
+        tarea.setOnFailed(e -> {
+            tablaProductos.setPlaceholder(new Label("No se pudo cargar el catálogo"));
+            mostrarError("No se pudo cargar el catálogo: " + tarea.getException().getMessage());
+        });
+
+        Thread hilo = new Thread(tarea);
+        hilo.setDaemon(true);
+        hilo.start();
     }
 
     /**

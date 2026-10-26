@@ -2,6 +2,8 @@ package cr.ac.una.est.pos.controller;
 
 import cr.ac.una.est.pos.model.Usuario;
 import cr.ac.una.est.pos.service.UsuarioService;
+import cr.ac.una.est.pos.dao.DAOException;
+import cr.ac.una.est.pos.dao.jdbc.UsuarioDAOJdbc;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
@@ -10,7 +12,6 @@ import javafx.scene.control.Label;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
 import javafx.stage.Stage;
-
 import java.io.IOException;
 
 /**
@@ -31,7 +32,7 @@ public class LoginController {
 
     @FXML
     public void initialize() {
-        usuarioService = new UsuarioService();
+        usuarioService = new UsuarioService(new UsuarioDAOJdbc());
         lblMensaje.setText("");
     }
 
@@ -45,7 +46,13 @@ public class LoginController {
             return;
         }
 
-        Usuario usuarioAutenticado = usuarioService.autenticar(usuario, contrasena);
+        Usuario usuarioAutenticado;
+        try {
+            usuarioAutenticado = usuarioService.autenticar(usuario, contrasena);
+        } catch (DAOException e) {
+            mostrarError("No se pudo conectar con la base de datos.");
+            return;
+        }
 
         if (usuarioAutenticado != null) {
             irAPantallaPrincipal(usuarioAutenticado);
