@@ -49,3 +49,207 @@
 .radio-button .text, .check-box .text {
     -fx-fill: #1a1a1a;
 }
+/* =====================================================
+   REPORTES - estilos de la pantalla de Reportes
+   Colores del tema claro (el tema oscuro los redefine en dark.css)
+   ===================================================== */
+
+.reporte-root {
+    -rp-card: #ffffff;
+    -rp-borde: #dfe3ea;
+    -rp-texto: #1f2430;
+    -rp-muted: #6b7280;
+    -rp-acento: #3b6fd4;
+    -fx-background-color: transparent;
+}
+
+/* ---------- Pestañas con subrayado ---------- */
+
+.reporte-root > .tab-header-area {
+    -fx-padding: 8 20 0 20;
+}
+
+.reporte-root > .tab-header-area > .tab-header-background {
+    -fx-background-color: transparent;
+    -fx-effect: none;
+}
+
+.reporte-root > .tab-header-area > .headers-region > .tab {
+    -fx-background-color: transparent;
+    -fx-background-insets: 0;
+    -fx-background-radius: 0;
+    -fx-padding: 8 18 8 18;
+    -fx-border-color: transparent;
+    -fx-border-width: 0 0 3 0;
+}
+
+.reporte-root > .tab-header-area > .headers-region > .tab .tab-label {
+    -fx-text-fill: -rp-muted;
+    -fx-font-size: 13px;
+    -fx-font-weight: bold;
+}
+
+.reporte-root > .tab-header-area > .headers-region > .tab:hover .tab-label {
+    -fx-text-fill: -rp-texto;
+}
+
+.reporte-root > .tab-header-area > .headers-region > .tab:selected {
+    -fx-border-color: transparent transparent -rp-acento transparent;
+}
+
+.reporte-root > .tab-header-area > .headers-region > .tab:selected .tab-label {
+    -fx-text-fill: -rp-texto;
+}
+
+/* Quita el recuadro azul de foco alrededor de la pestaña */
+.reporte-root > .tab-header-area > .headers-region > .tab .focus-indicator,
+.reporte-root:focused > .tab-header-area > .headers-region > .tab:selected .focus-indicator {
+    -fx-border-color: transparent;
+}
+
+.reporte-root > .tab-content-area {
+    -fx-background-color: transparent;
+    -fx-background-insets: 0;
+    -fx-padding: 0;
+}
+
+/* ---------- Página y encabezado ---------- */
+
+.reporte-root .reporte-pagina {
+    -fx-padding: 14 20 20 20;
+    -fx-spacing: 16;
+}
+
+.reporte-root .reporte-titulo {
+    -fx-font-size: 22px;
+    -fx-font-weight: bold;
+    -fx-text-fill: -rp-texto;
+}
+
+.reporte-root .reporte-subtitulo {
+    -fx-font-size: 13px;
+    -fx-text-fill: -rp-muted;
+}
+
+.reporte-root .placeholder-texto {
+    -fx-font-size: 14px;
+    -fx-text-fill: -rp-muted;
+}
+
+/* ---------- Botones ---------- */
+
+.reporte-root .btn-primario {
+    -fx-background-color: -rp-acento;
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+    -fx-background-radius: 8;
+    -fx-border-color: transparent;
+    -fx-padding: 7 18 7 18;
+    -fx-cursor: hand;
+}
+
+.reporte-root .btn-primario:hover {
+    -fx-background-color: derive(-rp-acento, -12%);
+}
+
+.reporte-root .btn-primario:pressed {
+    -fx-background-color: derive(-rp-acento, -22%);
+}
+
+.reporte-root .btn-chip {
+    -fx-background-color: transparent;
+    -fx-text-fill: -rp-texto;
+    -fx-background-radius: 8;
+    -fx-border-color: -rp-borde;
+    -fx-border-radius: 8;
+    -fx-padding: 6 14 6 14;
+    -fx-cursor: hand;
+}
+
+.reporte-root .btn-chip:hover {
+    -fx-background-color: derive(-rp-acento, 85%);
+    -fx-border-color: -rp-acento;
+}
+
+.reporte-root .btn-chip:pressed {
+    -fx-background-color: derive(-rp-acento, 70%);
+}
+
+/* ---------- Tarjetas de resumen (KPI) ---------- */
+
+.reporte-root .kpi-card {
+    -fx-background-color: -rp-card;
+    -fx-background-radius: 12;
+    -fx-border-color: -rp-borde -rp-borde -rp-borde #3b6fd4;
+    -fx-border-width: 1 1 1 4;
+    -fx-border-radius: 12;
+    -fx-padding: 14 18 14 18;
+    -fx-spacing: 4;
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.12), 8, 0, 0, 2);
+}
+
+.reporte-root .kpi-verde   { -fx-border-color: -rp-borde -rp-borde -rp-borde #1f9d55; }
+.reporte-root .kpi-naranja { -fx-border-color: -rp-borde -rp-borde -rp-borde #d97706; }
+.reporte-root .kpi-morado  { -fx-border-color: -rp-borde -rp-borde -rp-borde #7c4dff; }
+
+.reporte-root .kpi-titulo {
+    -fx-font-size: 11px;
+    -fx-font-weight: bold;
+    -fx-text-fill: -rp-muted;
+}
+
+.reporte-root .kpi-valor {
+    -fx-font-size: 24px;
+    -fx-font-weight: bold;
+    -fx-text-fill: -rp-texto;
+}
+
+/* ---------- Tablas ---------- */
+
+.reporte-root .table-view {
+    -fx-background-color: -rp-card;
+    -fx-background-radius: 10;
+    -fx-border-color: -rp-borde;
+    -fx-border-radius: 10;
+    -fx-padding: 1;
+}
+
+.reporte-root .table-view .column-header-background {
+    -fx-background-radius: 9 9 0 0;
+}
+
+.reporte-root .table-view .column-header .label {
+    -fx-font-size: 12px;
+    -fx-font-weight: bold;
+}
+
+.reporte-root .table-view .table-cell {
+    -fx-border-color: transparent;
+    -fx-padding: 6 10 6 10;
+    -fx-alignment: CENTER_LEFT;
+}
+
+/* ---------- Insignias (chips) de color ---------- */
+
+.reporte-root .chip {
+    -fx-padding: 2 10 2 10;
+    -fx-background-radius: 10;
+    -fx-font-size: 11px;
+    -fx-font-weight: bold;
+}
+
+/* Tipo de orden */
+.reporte-root .chip-local     { -fx-background-color: rgba(47, 111, 228, 0.16); -fx-text-fill: #2f6fe4; }
+.reporte-root .chip-express   { -fx-background-color: rgba(217, 119, 6, 0.16);  -fx-text-fill: #d97706; }
+.reporte-root .chip-mostrador { -fx-background-color: rgba(124, 77, 255, 0.16); -fx-text-fill: #7c4dff; }
+
+/* Método de pago */
+.reporte-root .chip-efectivo  { -fx-background-color: rgba(31, 157, 85, 0.16);  -fx-text-fill: #1f9d55; }
+.reporte-root .chip-tarjeta   { -fx-background-color: rgba(8, 145, 178, 0.16);  -fx-text-fill: #0891b2; }
+.reporte-root .chip-sinpe     { -fx-background-color: rgba(219, 39, 119, 0.16); -fx-text-fill: #db2777; }
+
+/* Acciones de la bitácora */
+.reporte-root .chip-login         { -fx-background-color: rgba(31, 157, 85, 0.16);   -fx-text-fill: #1f9d55; }
+.reporte-root .chip-logout        { -fx-background-color: rgba(139, 149, 165, 0.20); -fx-text-fill: #8b95a5; }
+.reporte-root .chip-factura       { -fx-background-color: rgba(47, 111, 228, 0.16);  -fx-text-fill: #2f6fe4; }
+.reporte-root .chip-login-fallido { -fx-background-color: rgba(229, 72, 77, 0.16);   -fx-text-fill: #e5484d; }
