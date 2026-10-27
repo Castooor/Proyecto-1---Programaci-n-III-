@@ -70,6 +70,7 @@ public class FacturaController {
         this.logService = logService;
         this.nombreUsuario = nombreUsuario;
     }
+
     /**
      * Recibe la orden a facturar (enviada desde la pantalla de
      * Órdenes a través de MainController) y muestra su resumen,
@@ -80,8 +81,6 @@ public class FacturaController {
      * @param ordenService el servicio de órdenes para registrar el pedido facturado
      * @return no retorna nada
      */
-
-
     public void setOrden(Orden orden, ProductoService productoService, OrdenService ordenService) {
         this.orden = orden;
         this.productoService = productoService;

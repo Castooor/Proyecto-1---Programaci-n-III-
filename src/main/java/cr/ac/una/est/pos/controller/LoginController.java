@@ -97,7 +97,9 @@ public class LoginController {
 
             Stage stage = (Stage) txtUsuario.getScene().getWindow();
             stage.setTitle("Sistema POS - Modo " + usuario.getTipoNegocio().getDescripcion());
-            stage.setScene(new Scene(root, 750, 500));
+            Scene escena = new Scene(root, 750, 500);
+            escena.getStylesheets().add(getClass().getResource("/css/light.css").toExternalForm());
+            stage.setScene(escena);
 
         } catch (IOException e) {
             mostrarError("No se pudo cargar la pantalla principal.");
