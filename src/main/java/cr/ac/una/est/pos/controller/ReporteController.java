@@ -109,6 +109,11 @@ public class ReporteController {
         lblResumen.setText("Consultando...");
 
         Task<List<VentaDia>> tarea = new Task<>() {
+            /**
+             * Consulta las ventas del día en el hilo secundario.
+             *
+             * @return ventas de la fecha elegida
+             */
             @Override
             protected List<VentaDia> call() {
                 return ordenService.ventasDelDia(fecha);
@@ -133,6 +138,11 @@ public class ReporteController {
     @FXML
     private void onActualizarBitacora() {
         Task<List<LogAccion>> tarea = new Task<>() {
+            /**
+             * Consulta la bitácora en el hilo secundario.
+             *
+             * @return las últimas acciones registradas
+             */
             @Override
             protected List<LogAccion> call() {
                 return logService.listarRecientes(LIMITE_BITACORA);
