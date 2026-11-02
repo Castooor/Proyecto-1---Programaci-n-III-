@@ -284,15 +284,43 @@
     -rp-acento: #5b8def;
 }
 
-/ ---------- DatePicker (selector de fecha) ---------- */
-.date-picker .arrow-button {
-    -fx-background-color: #30343b;
-    -fx-background-radius: 0 5 5 0;
+
+/* ---------- DatePicker (selector de fecha) ---------- */
+
+.date-picker {
+    -fx-background-color: #292d34;
+    -fx-border-color: #41464f;
+    -fx-background-radius: 5;
+    -fx-border-radius: 5;
 }
 
-.date-picker .arrow-button .arrow {
+.date-picker > .text-field {
+    -fx-background-color: #292d34;
+    -fx-text-fill: #f1f3f5;
+    -fx-prompt-text-fill: #8e959f;
+    -fx-background-radius: 5 0 0 5;
+    -fx-border-color: transparent;
+}
+
+.date-picker > .arrow-button {
+    -fx-background-color: #30343b;
+    -fx-background-radius: 0 5 5 0;
+    -fx-border-color: transparent;
+}
+
+.date-picker > .arrow-button:hover {
+    -fx-background-color: #3b414a;
+}
+
+.date-picker > .arrow-button > .arrow {
     -fx-background-color: #c9ced6;
 }
+
+.date-picker:focused {
+    -fx-border-color: #5b8def;
+}
+
+/* Calendario desplegable */
 
 .date-picker-popup {
     -fx-background-color: #202329;
@@ -316,8 +344,7 @@
     -fx-background-color: #303640;
 }
 
-.date-picker-popup .day-cell:selected,
-.date-picker-popup .day-cell.selected {
+.date-picker-popup .day-cell:selected {
     -fx-background-color: #3d6fc7;
     -fx-text-fill: white;
 }
@@ -325,6 +352,7 @@
 .date-picker-popup .day-cell.today {
     -fx-border-color: #5b8def;
 }
+
 
 /* ---------- Pestañas (TabPane) en modo oscuro ---------- */
 .tab-pane .tab-header-background {
